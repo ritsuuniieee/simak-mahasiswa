@@ -1,0 +1,159 @@
+:root {
+  --brand: #613b18;
+  --brand-dark: #452a11;
+  --brand-light: #f2e9e0;
+}
+
+body {
+  background-color: #f4f6f8;
+}
+
+.app-navbar {
+  background-color: var(--brand-dark);
+}
+
+.app-wrapper {
+  display: flex;
+  min-height: calc(100vh - 56px - 52px);
+}
+
+.app-sidebar {
+  width: 240px;
+  flex-shrink: 0;
+  background-color: #fff;
+  border-right: 1px solid #e5e7eb;
+}
+
+.sidebar-link {
+  display: block;
+  padding: 10px 14px;
+  border-radius: 8px;
+  color: #374151;
+  text-decoration: none;
+  font-size: 0.93rem;
+  margin-bottom: 2px;
+}
+
+.sidebar-link:hover {
+  background-color: var(--brand-light);
+  color: var(--brand-dark);
+}
+
+.sidebar-link.active {
+  background-color: var(--brand);
+  color: #fff;
+  font-weight: 600;
+}
+
+.app-content {
+  flex: 1;
+  padding: 24px;
+  min-width: 0;
+}
+
+.app-footer {
+  background: #fff;
+  border-top: 1px solid #e5e7eb;
+}
+
+.card-stat {
+  border: none;
+  border-radius: 14px;
+  color: #fff;
+  box-shadow: 0 4px 14px rgba(0,0,0,.08);
+}
+
+.card-stat .bi {
+  font-size: 2rem;
+  opacity: .85;
+}
+
+.bg-brand { background-color: var(--brand) !important; }
+
+.btn-success, .btn-outline-success {
+  --bs-btn-bg: var(--brand);
+  --bs-btn-border-color: var(--brand);
+  --bs-btn-hover-bg: var(--brand-dark);
+  --bs-btn-hover-border-color: var(--brand-dark);
+  --bs-btn-active-bg: var(--brand-dark);
+  --bs-btn-active-border-color: var(--brand-dark);
+  --bs-btn-color: var(--brand);
+  --bs-btn-hover-color: #fff;
+}
+
+.nav-pills .nav-link.active {
+  background-color: var(--brand) !important;
+}
+
+.login-wrapper {
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: linear-gradient(135deg, var(--brand-dark), var(--brand));
+}
+
+.login-page {
+    min-height: 100vh;
+    align-items: center;
+    justify-content: center;
+    background-image: url('../images/login-page.webp');
+    background-size: cover;
+    background-position: center;
+    background-repeat: no-repeat;
+}
+
+.login-container {
+    width: 400px;
+    padding: 35px;
+    border-radius: 20px;
+
+    background: rgba(255, 255, 255, 0.12);
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+
+    color: white;
+}
+
+.login-card {
+  width: 100%;
+  max-width: 400px;
+  border: none;
+  border-radius: 16px;
+  box-shadow: 0 10px 30px rgba(0,0,0,.2);
+}
+
+.table thead {
+  background-color: var(--brand-light);
+}
+
+.foto-peserta {
+  width: 42px;
+  height: 42px;
+  object-fit: cover;
+  border-radius: 8px;
+  border: 1px solid #e5e7eb;
+}
+
+.foto-preview-lg {
+  width: 140px;
+  height: 140px;
+  object-fit: cover;
+  border-radius: 12px;
+  border: 1px solid #e5e7eb;
+}
+
+@media (max-width: 768px) {
+  .app-sidebar {
+    position: fixed;
+    left: -240px;
+    top: 56px;
+    bottom: 0;
+    z-index: 1030;
+    transition: left .2s ease;
+  }
+  .app-sidebar.show { left: 0; }
+}
