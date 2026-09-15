@@ -25,6 +25,7 @@ $mhsList = $mhsList->fetchAll();
 
 include __DIR__ . '/../includes/header.php';
 ?>
+<<<<<<< HEAD
 <h4 class="mb-3">Absensi Peserta Bimbingan</h4>
 
 <form class="row g-2 mb-3">
@@ -47,6 +48,31 @@ include __DIR__ . '/../includes/header.php';
       <tbody>
       <?php if (!$absensiList): ?>
         <tr><td colspan="7" class="text-center text-muted py-4">Tidak ada data absensi.</td></tr>
+=======
+<h1 class="m3-page-title">Absensi peserta bimbingan</h1>
+
+<form class="m3-toolbar">
+  <select name="mahasiswa_id" class="m3-select" style="width:auto;min-width:220px">
+    <option value="">Semua peserta</option>
+    <?php foreach ($mhsList as $m): ?>
+      <option value="<?= $m['id'] ?>" <?= $mahasiswaFilter === (int)$m['id'] ? 'selected' : '' ?>><?= e($m['nama']) ?></option>
+    <?php endforeach; ?>
+  </select>
+  <input type="date" name="tanggal" class="m3-input" style="width:auto" value="<?= e($tanggal) ?>">
+  <button class="m3-btn m3-btn--tonal"><span class="m3-icon m3-icon--sm">filter_alt</span>Terapkan</button>
+  <a href="absensi.php" class="m3-btn m3-btn--text">Atur ulang</a>
+</form>
+
+<section class="m3-table-wrap">
+  <div class="m3-table-scroll">
+    <table class="m3-table">
+      <thead>
+        <tr><th>Tanggal</th><th>Tipe</th><th>Nama</th><th>Masuk</th><th>Status</th><th>Keluar</th><th>Status</th></tr>
+      </thead>
+      <tbody>
+      <?php if (!$absensiList): ?>
+        <tr><td colspan="7" class="m3-table__empty">Tidak ada data absensi untuk filter ini.</td></tr>
+>>>>>>> df20464 (Nambahin Dummy + Ngubah tampilan ke material)
       <?php endif; ?>
       <?php foreach ($absensiList as $a): ?>
         <tr>
@@ -62,6 +88,10 @@ include __DIR__ . '/../includes/header.php';
       </tbody>
     </table>
   </div>
+<<<<<<< HEAD
 </div>
+=======
+</section>
+>>>>>>> df20464 (Nambahin Dummy + Ngubah tampilan ke material)
 
 <?php include __DIR__ . '/../includes/footer.php'; ?>

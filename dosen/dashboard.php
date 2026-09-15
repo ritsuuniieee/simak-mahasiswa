@@ -25,6 +25,7 @@ $kegiatanTerbaru = $stmt->fetchAll();
 
 include __DIR__ . '/../includes/header.php';
 ?>
+<<<<<<< HEAD
 <h4 class="mb-4">Dashboard Dosen</h4>
 
 <div class="row g-3 mb-4">
@@ -50,10 +51,52 @@ include __DIR__ . '/../includes/header.php';
       <?php endif; ?>
       <?php foreach ($kegiatanTerbaru as $k): ?>
         <tr><td><?= formatTanggal($k['tanggal']) ?></td><td><?= e($k['nama_peserta']) ?></td><td><?= badgeTipe($k['tipe']) ?></td><td><?= e($k['judul']) ?></td></tr>
+=======
+<h1 class="m3-page-title">Dashboard dosen</h1>
+
+<div class="m3-cards-grid m3-mb-4">
+  <div class="m3-stat m3-stat--primary">
+    <span class="m3-stat__label">Mahasiswa bimbingan</span>
+    <span class="m3-stat__value"><?= (int)$totalMhs ?></span>
+    <span class="m3-icon m3-stat__icon">school</span>
+  </div>
+  <div class="m3-stat m3-stat--tertiary">
+    <span class="m3-stat__label">Siswa PKL bimbingan</span>
+    <span class="m3-stat__value"><?= (int)$totalPkl ?></span>
+    <span class="m3-icon m3-stat__icon">engineering</span>
+  </div>
+  <div class="m3-stat m3-stat--secondary">
+    <span class="m3-stat__label">Absen hari ini</span>
+    <span class="m3-stat__value"><?= (int)$absenHariIni ?></span>
+    <span class="m3-icon m3-stat__icon">event_available</span>
+  </div>
+</div>
+
+<section class="m3-table-wrap">
+  <div class="m3-card__header">Kegiatan harian terbaru</div>
+  <div class="m3-table-scroll m3-mt-2">
+    <table class="m3-table">
+      <thead><tr><th>Tanggal</th><th>Nama</th><th>Tipe</th><th>Judul kegiatan</th></tr></thead>
+      <tbody>
+      <?php if (!$kegiatanTerbaru): ?>
+        <tr><td colspan="4" class="m3-table__empty">Belum ada kegiatan tercatat.</td></tr>
+      <?php endif; ?>
+      <?php foreach ($kegiatanTerbaru as $k): ?>
+        <tr>
+          <td><?= formatTanggal($k['tanggal']) ?></td>
+          <td><?= e($k['nama_peserta']) ?></td>
+          <td><?= badgeTipe($k['tipe']) ?></td>
+          <td><?= e($k['judul']) ?></td>
+        </tr>
+>>>>>>> df20464 (Nambahin Dummy + Ngubah tampilan ke material)
       <?php endforeach; ?>
       </tbody>
     </table>
   </div>
+<<<<<<< HEAD
 </div>
+=======
+</section>
+>>>>>>> df20464 (Nambahin Dummy + Ngubah tampilan ke material)
 
 <?php include __DIR__ . '/../includes/footer.php'; ?>

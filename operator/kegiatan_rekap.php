@@ -21,6 +21,7 @@ $kegiatanList = $stmt->fetchAll();
 
 include __DIR__ . '/../includes/header.php';
 ?>
+<<<<<<< HEAD
 <h4 class="mb-3">Rekap Kegiatan Harian</h4>
 
 <form class="row g-2 mb-3">
@@ -47,6 +48,42 @@ include __DIR__ . '/../includes/header.php';
       </div>
     </div>
   </div>
+=======
+<h1 class="m3-page-title">Rekap kegiatan harian</h1>
+
+<form class="m3-toolbar" method="get">
+  <div class="m3-toolbar__search">
+    <input type="text" name="q" class="m3-input" value="<?= e($search) ?>"
+           placeholder="Cari nama, NIM, NISN, atau judul kegiatan">
+  </div>
+  <button class="m3-btn m3-btn--tonal"><span class="m3-icon m3-icon--sm">search</span>Cari</button>
+</form>
+
+<?php if (!$kegiatanList): ?>
+  <div class="m3-card m3-card--filled">
+    <div class="m3-card__body m3-text-center">
+      <span class="m3-icon m3-icon--xl m3-muted">edit_note</span>
+      <p class="m3-body-large m3-muted m3-mb-0">Belum ada kegiatan tercatat.</p>
+    </div>
+  </div>
+<?php endif; ?>
+
+<div class="m3-cards-grid m3-cards-grid--wide">
+<?php foreach ($kegiatanList as $k): ?>
+  <article class="m3-card m3-card--elevated">
+    <div class="m3-card__body">
+      <div class="m3-row--between m3-mb-1">
+        <h2 class="m3-title-medium m3-mb-0"><?= e($k['judul']) ?></h2>
+        <span class="m3-body-small m3-muted"><?= formatTanggal($k['tanggal']) ?></span>
+      </div>
+      <div class="m3-row m3-gap-sm m3-mb-2">
+        <span class="m3-body-small m3-muted"><?= e($k['nama_peserta']) ?></span>
+        <?= badgeTipe($k['tipe']) ?>
+      </div>
+      <p class="m3-body-medium m3-mb-0"><?= nl2br(e($k['deskripsi'])) ?></p>
+    </div>
+  </article>
+>>>>>>> df20464 (Nambahin Dummy + Ngubah tampilan ke material)
 <?php endforeach; ?>
 </div>
 

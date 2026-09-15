@@ -9,7 +9,11 @@ $pageTitle = $isEdit ? 'Edit Data Peserta' : 'Tambah Peserta';
 
 $data = [
     'tipe' => 'mahasiswa', 'nim' => '', 'nisn' => '', 'nama' => '', 'prodi' => '',
+<<<<<<< HEAD
     'asal_sekolah' => '', 'dosen_id' => '', 'no_hp' => '', 'alamat' => '',
+=======
+    'asal_sekolah' => '', 'jurusan' => '', 'dosen_id' => '', 'no_hp' => '', 'alamat' => '',
+>>>>>>> df20464 (Nambahin Dummy + Ngubah tampilan ke material)
     'status' => 'aktif', 'foto' => '',
 ];
 $errors = [];
@@ -128,6 +132,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
 include __DIR__ . '/../includes/header.php';
 ?>
+<<<<<<< HEAD
 <h4 class="mb-4"><?= e($pageTitle) ?></h4>
 
 <?php foreach ($errors as $err): ?>
@@ -192,6 +197,76 @@ include __DIR__ . '/../includes/header.php';
             <div class="col-md-6">
               <label class="form-label">Status</label>
               <select name="status" class="form-select">
+=======
+<h1 class="m3-page-title"><?= e($pageTitle) ?></h1>
+
+<?php foreach ($errors as $err): ?>
+  <div class="m3-banner m3-banner--error">
+    <span class="m3-icon">error</span><span class="m3-grow"><?= e($err) ?></span>
+  </div>
+<?php endforeach; ?>
+
+<section class="m3-card m3-card--elevated" style="max-width:960px">
+  <div class="m3-card__body">
+    <form method="post" enctype="multipart/form-data" novalidate>
+      <?= csrfField() ?>
+
+      <label class="m3-field__label">Tipe peserta</label>
+      <div class="m3-segmented m3-mb-3">
+        <input type="radio" name="tipe" id="tipeMhs" value="mahasiswa"
+               <?= $data['tipe'] === 'mahasiswa' ? 'checked' : '' ?> onchange="toggleTipe()">
+        <label for="tipeMhs"><span class="m3-icon m3-icon--sm">school</span>Mahasiswa</label>
+        <input type="radio" name="tipe" id="tipePkl" value="siswa_pkl"
+               <?= $data['tipe'] === 'siswa_pkl' ? 'checked' : '' ?> onchange="toggleTipe()">
+        <label for="tipePkl"><span class="m3-icon m3-icon--sm">engineering</span>Siswa PKL</label>
+      </div>
+
+      <div class="m3-grid">
+        <!-- Foto -->
+        <div class="m3-col-4">
+          <label class="m3-field__label">Foto peserta</label>
+          <img id="fotoPreview" alt="Pratinjau foto" class="m3-avatar m3-avatar--xl m3-mb-2"
+               src="<?= $data['foto'] ? FOTO_URL . rawurlencode($data['foto']) : '' ?>"
+               style="<?= $data['foto'] ? '' : 'display:none' ?>">
+          <input type="file" name="foto" class="m3-input" accept=".jpg,.jpeg,.png" onchange="previewFoto(this)">
+          <div class="m3-field__help">JPG atau PNG, maksimal 2 MB.</div>
+        </div>
+
+        <!-- Identitas -->
+        <div class="m3-col-8">
+          <div class="m3-grid">
+            <div class="m3-col-6" id="wrapNim">
+              <label class="m3-field__label" for="nim">NIM</label>
+              <input id="nim" type="text" name="nim" class="m3-input" value="<?= e($data['nim']) ?>">
+            </div>
+            <div class="m3-col-6" id="wrapNisn" style="display:none">
+              <label class="m3-field__label" for="nisn">NISN</label>
+              <input id="nisn" type="text" name="nisn" class="m3-input" value="<?= e($data['nisn']) ?>">
+            </div>
+            <div class="m3-col-12">
+              <label class="m3-field__label" for="nama">Nama lengkap</label>
+              <input id="nama" type="text" name="nama" class="m3-input" required value="<?= e($data['nama']) ?>">
+            </div>
+            <div class="m3-col-6" id="wrapProdi">
+              <label class="m3-field__label" for="prodi">Program studi</label>
+              <select id="prodi" name="prodi" class="m3-select">
+                <?php foreach (['Sistem Informasi','Teknik Informatika'] as $st): ?>
+                  <option value="<?= $st ?>" <?= $data['prodi'] === $st ? 'selected' : '' ?>><?= $st ?></option>
+                <?php endforeach; ?>
+              </select>
+            </div>
+            <div class="m3-col-12" id="wrapJurusan">
+              <label class="m3-field__label" for="jurusan">Jurusan</label>
+              <input id="jurusan" type="text" name="jurusan" class="m3-input" value="<?= e($data['jurusan']) ?>">
+            </div>
+            <div class="m3-col-6" id="wrapAsalSekolah" style="display:none">
+              <label class="m3-field__label" for="asal_sekolah">Asal sekolah</label>
+              <input id="asal_sekolah" type="text" name="asal_sekolah" class="m3-input" value="<?= e($data['asal_sekolah']) ?>">
+            </div>
+            <div class="m3-col-6">
+              <label class="m3-field__label" for="status">Status</label>
+              <select id="status" name="status" class="m3-select">
+>>>>>>> df20464 (Nambahin Dummy + Ngubah tampilan ke material)
                 <?php foreach (['aktif','cuti','lulus','selesai','nonaktif'] as $st): ?>
                   <option value="<?= $st ?>" <?= $data['status'] === $st ? 'selected' : '' ?>><?= ucfirst($st) ?></option>
                 <?php endforeach; ?>
@@ -200,6 +275,7 @@ include __DIR__ . '/../includes/header.php';
           </div>
         </div>
 
+<<<<<<< HEAD
         <div class="col-md-6">
           <label class="form-label">Dosen/Guru Pembimbing</label>
           <select name="dosen_id" class="form-select">
@@ -230,6 +306,52 @@ include __DIR__ . '/../includes/header.php';
 <script>
 function toggleTipe() {
   const isPkl = document.getElementById('tipePkl').checked;
+=======
+        <!-- Kontak & pembimbing -->
+        <div class="m3-col-6">
+          <label class="m3-field__label" for="dosen_id">Pembimbing</label>
+          <select id="dosen_id" name="dosen_id" class="m3-select">
+            <option value="">Belum ditentukan</option>
+            <?php foreach ($dosenList as $d): ?>
+              <option value="<?= $d['id'] ?>" <?= (string)$data['dosen_id'] === (string)$d['id'] ? 'selected' : '' ?>>
+                <?= e($d['nama']) ?>
+              </option>
+            <?php endforeach; ?>
+          </select>
+        </div>
+        <div class="m3-col-6">
+          <label class="m3-field__label" for="no_hp">No. HP</label>
+          <input id="no_hp" type="text" name="no_hp" class="m3-input" value="<?= e($data['no_hp']) ?>">
+        </div>
+        <div class="m3-col-12">
+          <label class="m3-field__label" for="alamat">Alamat</label>
+          <textarea id="alamat" name="alamat" class="m3-textarea" rows="2"><?= e($data['alamat']) ?></textarea>
+        </div>
+      </div>
+
+      <div class="m3-banner m3-banner--info m3-mt-3">
+        <span class="m3-icon">info</span>
+        <span class="m3-grow">
+          Peserta tidak memerlukan akun terpisah. Setelah tersimpan, mereka dapat membuka
+          <strong>portal peserta</strong> menggunakan NIM atau NISN untuk mengisi absensi,
+          mencatat kegiatan, dan mengunduh sertifikat.
+        </span>
+      </div>
+
+      <div class="m3-row m3-gap-sm m3-mt-3">
+        <button type="submit" class="m3-btn m3-btn--filled">
+          <span class="m3-icon m3-icon--sm">save</span>Simpan
+        </button>
+        <a href="<?= BASE_URL ?>/operator/mahasiswa.php" class="m3-btn m3-btn--text">Batal</a>
+      </div>
+    </form>
+  </div>
+</section>
+
+<script>
+function toggleTipe() {
+  var isPkl = document.getElementById('tipePkl').checked;
+>>>>>>> df20464 (Nambahin Dummy + Ngubah tampilan ke material)
   document.getElementById('wrapNim').style.display = isPkl ? 'none' : 'block';
   document.getElementById('wrapNisn').style.display = isPkl ? 'block' : 'none';
   document.getElementById('wrapAsalSekolah').style.display = isPkl ? 'block' : 'none';
@@ -237,7 +359,11 @@ function toggleTipe() {
   document.getElementById('wrapJurusan').style.display = isPkl ? 'block' : 'none';
 }
 function previewFoto(input) {
+<<<<<<< HEAD
   const preview = document.getElementById('fotoPreview');
+=======
+  var preview = document.getElementById('fotoPreview');
+>>>>>>> df20464 (Nambahin Dummy + Ngubah tampilan ke material)
   if (input.files && input.files[0]) {
     preview.src = URL.createObjectURL(input.files[0]);
     preview.style.display = 'block';

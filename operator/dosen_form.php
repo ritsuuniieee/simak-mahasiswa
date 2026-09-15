@@ -80,6 +80,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
 include __DIR__ . '/../includes/header.php';
 ?>
+<<<<<<< HEAD
 <h4 class="mb-4"><?= e($pageTitle) ?></h4>
 
 <?php foreach ($errors as $err): ?>
@@ -118,5 +119,50 @@ include __DIR__ . '/../includes/header.php';
     </form>
   </div>
 </div>
+=======
+<h1 class="m3-page-title"><?= e($pageTitle) ?></h1>
+
+<?php foreach ($errors as $err): ?>
+  <div class="m3-banner m3-banner--error">
+    <span class="m3-icon">error</span><span class="m3-grow"><?= e($err) ?></span>
+  </div>
+<?php endforeach; ?>
+
+<section class="m3-card m3-card--elevated" style="max-width:840px">
+  <div class="m3-card__body">
+    <form method="post" novalidate>
+      <?= csrfField() ?>
+      <div class="m3-grid">
+        <div class="m3-col-4">
+          <label class="m3-field__label" for="nidn_nidk">NIDN / NIDK</label>
+          <input id="nidn_nidk" type="text" name="nidn_nidk" class="m3-input" required value="<?= e($data['nidn_nidk']) ?>">
+        </div>
+        <div class="m3-col-8">
+          <label class="m3-field__label" for="nama">Nama lengkap</label>
+          <input id="nama" type="text" name="nama" class="m3-input" required value="<?= e($data['nama']) ?>">
+        </div>
+        <div class="m3-col-6">
+          <label class="m3-field__label" for="no_hp">No. HP</label>
+          <input id="no_hp" type="text" name="no_hp" class="m3-input" value="<?= e($data['no_hp']) ?>">
+        </div>
+        <?php if (!$isEdit): ?>
+        <div class="m3-col-6">
+          <label class="m3-field__label" for="username">Username untuk masuk</label>
+          <input id="username" type="text" name="username" class="m3-input" value="<?= e($data['username']) ?>">
+          <div class="m3-field__help">Password awal diset ke <code>password123</code>.</div>
+        </div>
+        <?php endif; ?>
+      </div>
+
+      <div class="m3-row m3-gap-sm m3-mt-3">
+        <button type="submit" class="m3-btn m3-btn--filled">
+          <span class="m3-icon m3-icon--sm">save</span>Simpan
+        </button>
+        <a href="<?= BASE_URL ?>/operator/dosen.php" class="m3-btn m3-btn--text">Batal</a>
+      </div>
+    </form>
+  </div>
+</section>
+>>>>>>> df20464 (Nambahin Dummy + Ngubah tampilan ke material)
 
 <?php include __DIR__ . '/../includes/footer.php'; ?>

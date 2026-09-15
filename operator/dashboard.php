@@ -12,6 +12,7 @@ $totalSertifikat = $pdo->query("SELECT COUNT(*) FROM sertifikat")->fetchColumn()
 $absenHariIni = $pdo->query("SELECT COUNT(*) FROM absensi WHERE tanggal = CURDATE()")->fetchColumn();
 $terlambatHariIni = $pdo->query("SELECT COUNT(*) FROM absensi WHERE tanggal = CURDATE() AND status_masuk='terlambat'")->fetchColumn();
 
+<<<<<<< HEAD
 // $errors = [];
 // if ($_SERVER['REQUEST_METHOD'] === 'POST' && ($_POST['action'] ?? '') === 'ganti_password') {
 //     if (!csrfValid()) {
@@ -27,6 +28,8 @@ $terlambatHariIni = $pdo->query("SELECT COUNT(*) FROM absensi WHERE tanggal = CU
 //                 exit;
 //             }
 //         }
+=======
+>>>>>>> df20464 (Nambahin Dummy + Ngubah tampilan ke material)
 
 $stmt = $pdo->query("
   SELECT k.tanggal, k.judul, m.nama AS nama_peserta, m.tipe
@@ -37,6 +40,7 @@ $kegiatanTerbaru = $stmt->fetchAll();
 
 include __DIR__ . '/../includes/header.php';
 ?>
+<<<<<<< HEAD
 <h4 class="mb-4 d-flex justify-content-between align-items-center mb-3 flex-wrap gap-2">
   Dashboard Operator
     <button class="btn btn-success" data-bs-toggle="modal" data-bs-target="#modalGantiPassword">
@@ -80,6 +84,44 @@ include __DIR__ . '/../includes/header.php';
       <tbody>
       <?php if (!$kegiatanTerbaru): ?>
         <tr><td colspan="4" class="text-center text-muted py-3">Belum ada kegiatan tercatat.</td></tr>
+=======
+<h1 class="m3-page-title">Dashboard operator</h1>
+
+<div class="m3-cards-grid m3-mb-4">
+  <div class="m3-stat m3-stat--primary">
+    <span class="m3-stat__label">Mahasiswa</span>
+    <span class="m3-stat__value"><?= (int)$totalMhs ?></span>
+    <span class="m3-icon m3-stat__icon">school</span>
+  </div>
+  <div class="m3-stat m3-stat--tertiary">
+    <span class="m3-stat__label">Siswa PKL</span>
+    <span class="m3-stat__value"><?= (int)$totalPkl ?></span>
+    <span class="m3-icon m3-stat__icon">engineering</span>
+  </div>
+  <div class="m3-stat m3-stat--secondary">
+    <span class="m3-stat__label">Dosen pembimbing</span>
+    <span class="m3-stat__value"><?= (int)$totalDosen ?></span>
+    <span class="m3-icon m3-stat__icon">badge</span>
+  </div>
+  <div class="m3-stat <?= $terlambatHariIni > 0 ? 'm3-stat--warning' : 'm3-stat--success' ?>">
+    <span class="m3-stat__label">Absen hari ini</span>
+    <span class="m3-stat__value"><?= (int)$absenHariIni ?></span>
+    <span class="m3-stat__meta"><?= (int)$terlambatHariIni ?> terlambat</span>
+    <span class="m3-icon m3-stat__icon">event_available</span>
+  </div>
+</div>
+
+<section class="m3-table-wrap">
+  <div class="m3-card__header">Kegiatan harian terbaru</div>
+  <div class="m3-table-scroll m3-mt-2">
+    <table class="m3-table">
+      <thead>
+        <tr><th>Tanggal</th><th>Nama</th><th>Tipe</th><th>Judul kegiatan</th></tr>
+      </thead>
+      <tbody>
+      <?php if (!$kegiatanTerbaru): ?>
+        <tr><td colspan="4" class="m3-table__empty">Belum ada kegiatan tercatat.</td></tr>
+>>>>>>> df20464 (Nambahin Dummy + Ngubah tampilan ke material)
       <?php endif; ?>
       <?php foreach ($kegiatanTerbaru as $k): ?>
         <tr>
@@ -92,6 +134,7 @@ include __DIR__ . '/../includes/header.php';
       </tbody>
     </table>
   </div>
+<<<<<<< HEAD
 </div>
 
 <div class="modal fade" id="modalGantiPassword" tabindex="-1">
@@ -114,5 +157,8 @@ include __DIR__ . '/../includes/header.php';
     </form>
   </div>
 </div>
+=======
+</section>
+>>>>>>> df20464 (Nambahin Dummy + Ngubah tampilan ke material)
 
 <?php include __DIR__ . '/../includes/footer.php'; ?>

@@ -59,11 +59,26 @@ function labelTipe(string $tipe): string {
     return $tipe === 'siswa_pkl' ? 'Siswa PKL' : 'Mahasiswa';
 }
 
+<<<<<<< HEAD
 /** Badge Bootstrap untuk tipe peserta */
 function badgeTipe(string $tipe): string {
     return $tipe === 'siswa_pkl'
         ? '<span class="badge text-bg-info text-dark">Siswa PKL</span>'
         : '<span class="badge text-bg-secondary">Mahasiswa</span>';
+=======
+/** Label Material 3 untuk tipe peserta */
+function badgeTipe(string $tipe): string {
+    return $tipe === 'siswa_pkl'
+        ? '<span class="m3-badge m3-badge--tertiary">Siswa PKL</span>'
+        : '<span class="m3-badge m3-badge--secondary">Mahasiswa</span>';
+}
+
+/** Label Material 3 untuk status keaktifan peserta */
+function badgeStatusPeserta(?string $status): string {
+    $variant = in_array($status, ['aktif'], true) ? 'success'
+             : (in_array($status, ['lulus', 'selesai'], true) ? 'primary' : 'neutral');
+    return '<span class="m3-badge m3-badge--' . $variant . '">' . e(ucfirst($status ?? '-')) . '</span>';
+>>>>>>> df20464 (Nambahin Dummy + Ngubah tampilan ke material)
 }
 
 /** Nomor identitas yang relevan (NIM untuk mahasiswa, NISN untuk siswa PKL) */
@@ -93,6 +108,7 @@ function hitungStatusKeluar(string $tipe, string $jamSekarang): string {
     return $jamSekarang >= JAM_PULANG_STANDAR ? 'sesuai_jadwal' : 'pulang_cepat';
 }
 
+<<<<<<< HEAD
 /** Badge Bootstrap untuk status_masuk / status_keluar (dipakai bersama) */
 function badgeStatusAbsen(?string $status): string {
     switch ($status) {
@@ -106,6 +122,21 @@ function badgeStatusAbsen(?string $status): string {
             return '<span class="badge text-bg-warning text-dark">Pulang Cepat</span>';
         default:
             return '<span class="badge text-bg-light text-dark border">-</span>';
+=======
+/** Label Material 3 untuk status_masuk / status_keluar (dipakai bersama) */
+function badgeStatusAbsen(?string $status): string {
+    switch ($status) {
+        case 'tepat_waktu':
+            return '<span class="m3-badge m3-badge--success">Tepat waktu</span>';
+        case 'terlambat':
+            return '<span class="m3-badge m3-badge--error">Terlambat</span>';
+        case 'sesuai_jadwal':
+            return '<span class="m3-badge m3-badge--success">Sesuai jadwal</span>';
+        case 'pulang_cepat':
+            return '<span class="m3-badge m3-badge--warning">Pulang cepat</span>';
+        default:
+            return '<span class="m3-badge m3-badge--neutral">Belum ada</span>';
+>>>>>>> df20464 (Nambahin Dummy + Ngubah tampilan ke material)
     }
 }
 

@@ -1,6 +1,13 @@
 {
+<<<<<<< HEAD
   "dependencies": {
     "bootstrap": "^5.3.8",
     "bootstrap-icons": "^1.13.1"
   }
+=======
+  "name": "simak-mahasiswa-pkl",
+  "private": true,
+  "description": "SIMAK Mahasiswa & PKL — UI berbasis Material 3 Expressive, tanpa dependensi build.",
+  "dependencies": {}
+>>>>>>> df20464 (Nambahin Dummy + Ngubah tampilan ke material)
 }

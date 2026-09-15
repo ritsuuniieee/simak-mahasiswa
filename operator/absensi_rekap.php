@@ -36,6 +36,7 @@ $rekap = $stmt->fetch();
 
 include __DIR__ . '/../includes/header.php';
 ?>
+<<<<<<< HEAD
 <h4 class="mb-3">Rekap Absensi</h4>
 
 <div class="row g-3 mb-3">
@@ -76,12 +77,66 @@ include __DIR__ . '/../includes/header.php';
       <tbody>
       <?php if (!$absensiList): ?>
         <tr><td colspan="8" class="text-center text-muted py-4">Tidak ada data absensi.</td></tr>
+=======
+<h1 class="m3-page-title">Rekap absensi</h1>
+
+<div class="m3-cards-grid m3-mb-3">
+  <div class="m3-stat m3-stat--primary">
+    <span class="m3-stat__label">Total rekaman</span>
+    <span class="m3-stat__value"><?= (int)$rekap['total'] ?></span>
+    <span class="m3-icon m3-stat__icon">fact_check</span>
+  </div>
+  <div class="m3-stat m3-stat--success">
+    <span class="m3-stat__label">Tepat waktu</span>
+    <span class="m3-stat__value"><?= (int)$rekap['tepat_waktu'] ?></span>
+    <span class="m3-icon m3-stat__icon">schedule</span>
+  </div>
+  <div class="m3-stat m3-stat--error">
+    <span class="m3-stat__label">Terlambat</span>
+    <span class="m3-stat__value"><?= (int)$rekap['terlambat'] ?></span>
+    <span class="m3-icon m3-stat__icon">running_late</span>
+  </div>
+  <div class="m3-stat m3-stat--warning">
+    <span class="m3-stat__label">Pulang cepat</span>
+    <span class="m3-stat__value"><?= (int)$rekap['pulang_cepat'] ?></span>
+    <span class="m3-icon m3-stat__icon">logout</span>
+  </div>
+</div>
+
+<form class="m3-toolbar">
+  <input type="date" name="tanggal" class="m3-input" style="width:auto" value="<?= e($tanggal) ?>">
+  <select name="tipe" class="m3-select" style="width:auto">
+    <option value="">Semua tipe</option>
+    <option value="mahasiswa" <?= $tipeFilter === 'mahasiswa' ? 'selected' : '' ?>>Mahasiswa</option>
+    <option value="siswa_pkl" <?= $tipeFilter === 'siswa_pkl' ? 'selected' : '' ?>>Siswa PKL</option>
+  </select>
+  <div class="m3-toolbar__search">
+    <input type="text" name="q" class="m3-input" value="<?= e($search) ?>" placeholder="Cari nama, NIM, atau NISN">
+  </div>
+  <button class="m3-btn m3-btn--tonal"><span class="m3-icon m3-icon--sm">filter_alt</span>Terapkan</button>
+  <a href="absensi_rekap.php" class="m3-btn m3-btn--text">Atur ulang</a>
+</form>
+
+<section class="m3-table-wrap">
+  <div class="m3-table-scroll">
+    <table class="m3-table">
+      <thead>
+        <tr><th>Tanggal</th><th>Tipe</th><th>No. ID</th><th>Nama</th><th>Masuk</th><th>Status</th><th>Keluar</th><th>Status</th></tr>
+      </thead>
+      <tbody>
+      <?php if (!$absensiList): ?>
+        <tr><td colspan="8" class="m3-table__empty">Tidak ada data absensi untuk filter ini.</td></tr>
+>>>>>>> df20464 (Nambahin Dummy + Ngubah tampilan ke material)
       <?php endif; ?>
       <?php foreach ($absensiList as $a): ?>
         <tr>
           <td><?= formatTanggal($a['tanggal']) ?></td>
           <td><?= badgeTipe($a['tipe']) ?></td>
+<<<<<<< HEAD
           <td><?= e($a['tipe']==='siswa_pkl' ? $a['nisn'] : $a['nim']) ?></td>
+=======
+          <td><?= e($a['tipe'] === 'siswa_pkl' ? $a['nisn'] : $a['nim']) ?></td>
+>>>>>>> df20464 (Nambahin Dummy + Ngubah tampilan ke material)
           <td><?= e($a['nama_peserta']) ?></td>
           <td><?= formatJam($a['jam_masuk']) ?></td>
           <td><?= badgeStatusAbsen($a['status_masuk']) ?></td>
@@ -92,7 +147,14 @@ include __DIR__ . '/../includes/header.php';
       </tbody>
     </table>
   </div>
+<<<<<<< HEAD
 </div>
 <p class="text-muted small mt-2">Tabel menampilkan maksimal 300 baris terbaru; kartu ringkasan di atas menghitung seluruh data sesuai filter.</p>
+=======
+</section>
+<p class="m3-body-small m3-muted m3-mt-2">
+  Tabel menampilkan maksimal 300 baris terbaru. Kartu ringkasan di atas menghitung seluruh data sesuai filter.
+</p>
+>>>>>>> df20464 (Nambahin Dummy + Ngubah tampilan ke material)
 
 <?php include __DIR__ . '/../includes/footer.php'; ?>

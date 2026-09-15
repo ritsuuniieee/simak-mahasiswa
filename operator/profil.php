@@ -61,6 +61,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
 include __DIR__ . '/../includes/header.php';
 ?>
+<<<<<<< HEAD
 <h4 class="mb-3">Profil Saya</h4>
 
 <?php foreach ($errors as $err): ?>
@@ -77,11 +78,29 @@ include __DIR__ . '/../includes/header.php';
       <div class="col-md-6">
         <p class="mb-1 text-muted small">Role</p>
         <p class="fw-semibold text-uppercase"><?= e($user['role']) ?></p>
+=======
+<h1 class="m3-page-title">Profil saya</h1>
+
+<?php foreach ($errors as $err): ?>
+  <div class="m3-banner m3-banner--error">
+    <span class="m3-icon">error</span><span class="m3-grow"><?= e($err) ?></span>
+  </div>
+<?php endforeach; ?>
+
+<section class="m3-card m3-card--elevated" style="max-width:840px">
+  <div class="m3-card__body">
+    <div class="m3-row m3-mb-3" style="gap:20px">
+      <div class="m3-avatar"><span class="m3-icon">account_circle</span></div>
+      <div>
+        <div class="m3-title-medium"><?= e($user['username']) ?></div>
+        <span class="m3-badge m3-badge--secondary"><?= e(ucfirst($user['role'])) ?></span>
+>>>>>>> df20464 (Nambahin Dummy + Ngubah tampilan ke material)
       </div>
     </div>
 
     <form method="post">
       <?= csrfField() ?>
+<<<<<<< HEAD
       <div class="row g-3">
         <div class="col-md-6">
           <label class="form-label">Nama Lengkap</label>
@@ -115,5 +134,45 @@ include __DIR__ . '/../includes/header.php';
     </form>
   </div>
 </div>
+=======
+      <div class="m3-grid">
+        <div class="m3-col-6">
+          <label class="m3-field__label" for="nama">Nama lengkap</label>
+          <input id="nama" type="text" name="nama" class="m3-input" required value="<?= e($user['nama']) ?>">
+        </div>
+        <div class="m3-col-6">
+          <label class="m3-field__label" for="email">Email</label>
+          <input id="email" type="email" name="email" class="m3-input" value="<?= e($user['email']) ?>">
+        </div>
+      </div>
+
+      <hr>
+
+      <h2 class="m3-title-medium m3-mb-1">Ganti password</h2>
+      <p class="m3-body-medium m3-muted m3-mb-2">Kosongkan ketiga kolom ini jika password tidak diubah.</p>
+
+      <div class="m3-grid">
+        <div class="m3-col-4">
+          <label class="m3-field__label" for="password_lama">Password lama</label>
+          <input id="password_lama" type="password" name="password_lama" class="m3-input" autocomplete="current-password">
+        </div>
+        <div class="m3-col-4">
+          <label class="m3-field__label" for="password_baru">Password baru</label>
+          <input id="password_baru" type="password" name="password_baru" class="m3-input" autocomplete="new-password">
+          <div class="m3-field__help">Minimal 6 karakter.</div>
+        </div>
+        <div class="m3-col-4">
+          <label class="m3-field__label" for="password_konfirmasi">Ulangi password baru</label>
+          <input id="password_konfirmasi" type="password" name="password_konfirmasi" class="m3-input" autocomplete="new-password">
+        </div>
+      </div>
+
+      <button type="submit" class="m3-btn m3-btn--filled m3-mt-3">
+        <span class="m3-icon m3-icon--sm">save</span>Simpan perubahan
+      </button>
+    </form>
+  </div>
+</section>
+>>>>>>> df20464 (Nambahin Dummy + Ngubah tampilan ke material)
 
 <?php include __DIR__ . '/../includes/footer.php'; ?>

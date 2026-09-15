@@ -75,6 +75,7 @@ $sertifikatList = $stmt->fetchAll();
 
 include __DIR__ . '/../includes/header.php';
 ?>
+<<<<<<< HEAD
 <h4 class="mb-3">Sertifikat Mahasiswa &amp; Siswa PKL</h4>
 
 <?php foreach ($errors as $err): ?>
@@ -124,23 +125,106 @@ include __DIR__ . '/../includes/header.php';
       <tbody>
       <?php if (!$sertifikatList): ?>
         <tr><td colspan="6" class="text-center text-muted py-4">Belum ada sertifikat.</td></tr>
+=======
+<h1 class="m3-page-title">Sertifikat</h1>
+
+<?php foreach ($errors as $err): ?>
+  <div class="m3-banner m3-banner--error">
+    <span class="m3-icon">error</span><span class="m3-grow"><?= e($err) ?></span>
+  </div>
+<?php endforeach; ?>
+
+<section class="m3-card m3-card--filled m3-mb-4">
+  <div class="m3-card__header">Unggah sertifikat</div>
+  <div class="m3-card__body">
+    <p class="m3-body-medium m3-muted">Sertifikat yang diunggah di sini langsung tampil di portal peserta yang bersangkutan.</p>
+    <form method="post" enctype="multipart/form-data">
+      <?= csrfField() ?>
+      <div class="m3-grid">
+        <div class="m3-col-4">
+          <label class="m3-field__label" for="mahasiswa_id">Pemilik sertifikat</label>
+          <select id="mahasiswa_id" name="mahasiswa_id" class="m3-select" required>
+            <option value="">Pilih peserta</option>
+            <?php foreach ($pesertaList as $p): ?>
+              <option value="<?= $p['id'] ?>">
+                <?= e($p['nama']) ?> (<?= e($p['tipe'] === 'siswa_pkl' ? $p['nisn'] : $p['nim']) ?>)
+              </option>
+            <?php endforeach; ?>
+          </select>
+        </div>
+        <div class="m3-col-4">
+          <label class="m3-field__label" for="judul">Judul sertifikat</label>
+          <input id="judul" type="text" name="judul" class="m3-input" required
+                 placeholder="Contoh: Sertifikat PKL semester genap">
+        </div>
+        <div class="m3-col-4">
+          <label class="m3-field__label" for="file">Berkas</label>
+          <input id="file" type="file" name="file" class="m3-input" accept=".pdf,.jpg,.jpeg,.png" required>
+          <div class="m3-field__help">PDF, JPG, atau PNG. Maksimal 5 MB.</div>
+        </div>
+      </div>
+      <button type="submit" class="m3-btn m3-btn--filled m3-mt-3">
+        <span class="m3-icon m3-icon--sm">upload</span>Unggah sertifikat
+      </button>
+    </form>
+  </div>
+</section>
+
+<form class="m3-toolbar">
+  <div class="m3-toolbar__search">
+    <input type="text" name="q" class="m3-input" value="<?= e($search) ?>"
+           placeholder="Cari nama, NIM, NISN, atau judul sertifikat">
+  </div>
+  <button class="m3-btn m3-btn--tonal"><span class="m3-icon m3-icon--sm">search</span>Cari</button>
+</form>
+
+<section class="m3-table-wrap">
+  <div class="m3-table-scroll">
+    <table class="m3-table">
+      <thead>
+        <tr><th>Tanggal</th><th>Tipe</th><th>No. ID</th><th>Nama</th><th>Judul sertifikat</th><th class="m3-td-actions">Aksi</th></tr>
+      </thead>
+      <tbody>
+      <?php if (!$sertifikatList): ?>
+        <tr><td colspan="6" class="m3-table__empty">Belum ada sertifikat diunggah.</td></tr>
+>>>>>>> df20464 (Nambahin Dummy + Ngubah tampilan ke material)
       <?php endif; ?>
       <?php foreach ($sertifikatList as $s): ?>
         <tr>
           <td><?= formatTanggal($s['tanggal_upload']) ?></td>
           <td><?= badgeTipe($s['tipe']) ?></td>
+<<<<<<< HEAD
           <td><?= e($s['tipe']==='siswa_pkl' ? $s['nisn'] : $s['nim']) ?></td>
           <td><?= e($s['nama_peserta']) ?></td>
           <td><?= e($s['judul']) ?></td>
           <td class="text-end">
             <a href="<?= UPLOAD_URL . rawurlencode($s['file_path']) ?>" target="_blank" class="btn btn-sm btn-outline-success"><i class="bi bi-download"></i></a>
             <a href="?delete=<?= $s['id'] ?>" class="btn btn-sm btn-outline-danger" onclick="return confirm('Hapus sertifikat \'<?= e($s['judul']) ?>\'?');"><i class="bi bi-trash"></i></a>
+=======
+          <td><?= e($s['tipe'] === 'siswa_pkl' ? $s['nisn'] : $s['nim']) ?></td>
+          <td><?= e($s['nama_peserta']) ?></td>
+          <td><?= e($s['judul']) ?></td>
+          <td class="m3-td-actions">
+            <a href="<?= UPLOAD_URL . rawurlencode($s['file_path']) ?>" target="_blank"
+               class="m3-icon-btn m3-icon-btn--success" title="Unduh" aria-label="Unduh sertifikat">
+              <span class="m3-icon m3-icon--sm">download</span>
+            </a>
+            <a href="?delete=<?= $s['id'] ?>" class="m3-icon-btn m3-icon-btn--danger"
+               title="Hapus" aria-label="Hapus sertifikat"
+               onclick="return confirm('Hapus sertifikat \'<?= e($s['judul']) ?>\'?');">
+              <span class="m3-icon m3-icon--sm">delete</span>
+            </a>
+>>>>>>> df20464 (Nambahin Dummy + Ngubah tampilan ke material)
           </td>
         </tr>
       <?php endforeach; ?>
       </tbody>
     </table>
   </div>
+<<<<<<< HEAD
 </div>
+=======
+</section>
+>>>>>>> df20464 (Nambahin Dummy + Ngubah tampilan ke material)
 
 <?php include __DIR__ . '/../includes/footer.php'; ?>
