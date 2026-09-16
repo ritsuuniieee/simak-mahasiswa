@@ -27,41 +27,6 @@ $mhsList = $mhsList->fetchAll();
 
 include __DIR__ . '/../includes/header.php';
 ?>
-<<<<<<< HEAD
-<h4 class="mb-3">Kegiatan Harian Peserta Bimbingan</h4>
-
-<form class="row g-2 mb-3">
-  <div class="col-auto">
-    <select name="mahasiswa_id" class="form-select">
-      <option value="">-- Semua Peserta --</option>
-      <?php foreach ($mhsList as $m): ?>
-        <option value="<?= $m['id'] ?>" <?= $mahasiswaFilter === (int)$m['id'] ? 'selected' : '' ?>><?= e($m['nama']) ?></option>
-      <?php endforeach; ?>
-    </select>
-  </div>
-  <div class="col-auto">
-    <button class="btn btn-outline-secondary"><i class="bi bi-search"></i> Filter</button>
-  </div>
-</form>
-
-<div class="row g-3">
-<?php if (!$kegiatanList): ?>
-  <p class="text-muted text-center py-4">Belum ada kegiatan tercatat.</p>
-<?php endif; ?>
-<?php foreach ($kegiatanList as $k): ?>
-  <div class="col-md-6">
-    <div class="card border-0 shadow-sm h-100">
-      <div class="card-body">
-        <div class="d-flex justify-content-between">
-          <h6 class="card-title mb-1"><?= e($k['judul']) ?></h6>
-          <small class="text-muted"><?= formatTanggal($k['tanggal']) ?></small>
-        </div>
-        <div class="small text-muted mb-2"><?= e($k['nama_peserta']) ?> &middot; <?= badgeTipe($k['tipe']) ?></div>
-        <p class="card-text mb-0"><?= nl2br(e($k['deskripsi'])) ?></p>
-      </div>
-    </div>
-  </div>
-=======
 <h1 class="m3-page-title">Kegiatan harian peserta bimbingan</h1>
 
 <form class="m3-toolbar">
@@ -98,7 +63,6 @@ include __DIR__ . '/../includes/header.php';
       <p class="m3-body-medium m3-mb-0"><?= nl2br(e($k['deskripsi'])) ?></p>
     </div>
   </article>
->>>>>>> df20464 (Nambahin Dummy + Ngubah tampilan ke material)
 <?php endforeach; ?>
 </div>
 

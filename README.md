@@ -79,12 +79,8 @@ simak-mahasiswa/
 ├── login.php / logout.php / index.php   # login staf (operator/dosen)
 ├── uploads/foto/               # foto peserta
 ├── uploads/sertifikat/         # file sertifikat
-<<<<<<< HEAD
-├── assets/vendor/              # Bootstrap & Bootstrap Icons lokal (bukan CDN)
-=======
 ├── assets/css/material3.css    # design system Material 3 (menggantikan Bootstrap)
 ├── assets/js/material3.js      # interaksi drawer, dialog, banner
->>>>>>> df20464 (Nambahin Dummy + Ngubah tampilan ke material)
 ```
 
 ## Instalasi
@@ -92,11 +88,7 @@ simak-mahasiswa/
 1. Salin project ke folder web server (misal `htdocs/aplikasi-manajemen-mahasiswa`).
 2. Import `database/schema.sql` ke MySQL.
 3. Sesuaikan `config/database.php`: `DB_HOST`/`DB_USER`/`DB_PASS`, `BASE_URL`, dan patokan jam (`JAM_MASUK_MAHASISWA`, `JAM_MASUK_SISWA_PKL`, `JAM_PULANG_STANDAR`) jika perlu diubah.
-<<<<<<< HEAD
-4. Pastikan folder `assets/vendor/bootstrap/` dan `assets/vendor/bootstrap-icons/` sudah berisi file Bootstrap hasil `npm install` (lihat instruksi terpisah bila belum).
-=======
 4. Tidak ada dependensi yang perlu di-build. Bila server tanpa akses internet, ikuti bagian "Ikon dan font" di atas untuk memakai font lokal.
->>>>>>> df20464 (Nambahin Dummy + Ngubah tampilan ke material)
 5. Buka `database/seed.php` di browser **satu kali** untuk membuat akun staf contoh dan 2 data peserta contoh, lalu **hapus file itu**.
 6. Login staf di `login.php` (operator1 / dosen1, password `password123`), atau buka `portal.php` untuk mencoba Portal Publik peserta (NIM `2110511001` atau NISN `0051234567`).
 

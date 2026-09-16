@@ -36,48 +36,6 @@ $rekap = $stmt->fetch();
 
 include __DIR__ . '/../includes/header.php';
 ?>
-<<<<<<< HEAD
-<h4 class="mb-3">Rekap Absensi</h4>
-
-<div class="row g-3 mb-3">
-  <div class="col-6 col-md-3">
-    <div class="card card-stat bg-brand p-3 text-center"><div class="small">Total Rekaman</div><div class="fs-4 fw-bold"><?= (int)$rekap['total'] ?></div></div>
-  </div>
-  <div class="col-6 col-md-3">
-    <div class="card card-stat p-3 text-center" style="background:#16a34a"><div class="small">Tepat Waktu</div><div class="fs-4 fw-bold"><?= (int)$rekap['tepat_waktu'] ?></div></div>
-  </div>
-  <div class="col-6 col-md-3">
-    <div class="card card-stat p-3 text-center" style="background:#dc2626"><div class="small">Terlambat</div><div class="fs-4 fw-bold"><?= (int)$rekap['terlambat'] ?></div></div>
-  </div>
-  <div class="col-6 col-md-3">
-    <div class="card card-stat p-3 text-center" style="background:#f59e0b"><div class="small">Pulang Cepat (PKL)</div><div class="fs-4 fw-bold"><?= (int)$rekap['pulang_cepat'] ?></div></div>
-  </div>
-</div>
-
-<form class="row g-2 mb-3">
-  <div class="col-auto"><input type="date" name="tanggal" class="form-control" value="<?= e($tanggal) ?>"></div>
-  <div class="col-auto">
-    <select name="tipe" class="form-select">
-      <option value="">Semua Tipe</option>
-      <option value="mahasiswa" <?= $tipeFilter==='mahasiswa'?'selected':'' ?>>Mahasiswa</option>
-      <option value="siswa_pkl" <?= $tipeFilter==='siswa_pkl'?'selected':'' ?>>Siswa PKL</option>
-    </select>
-  </div>
-  <div class="col-auto flex-grow-1"><input type="text" name="q" class="form-control" placeholder="Cari nama / NIM / NISN..." value="<?= e($search) ?>"></div>
-  <div class="col-auto">
-    <button class="btn btn-outline-secondary"><i class="bi bi-search"></i> Filter</button>
-    <a href="absensi_rekap.php" class="btn btn-outline-danger"><i class="bi bi-x-lg"></i></a>
-  </div>
-</form>
-
-<div class="card border-0 shadow-sm">
-  <div class="table-responsive">
-    <table class="table mb-0 align-middle">
-      <thead><tr><th>Tanggal</th><th>Tipe</th><th>No. ID</th><th>Nama</th><th>Masuk</th><th>Status</th><th>Keluar</th><th>Status</th></tr></thead>
-      <tbody>
-      <?php if (!$absensiList): ?>
-        <tr><td colspan="8" class="text-center text-muted py-4">Tidak ada data absensi.</td></tr>
-=======
 <h1 class="m3-page-title">Rekap absensi</h1>
 
 <div class="m3-cards-grid m3-mb-3">
@@ -126,17 +84,12 @@ include __DIR__ . '/../includes/header.php';
       <tbody>
       <?php if (!$absensiList): ?>
         <tr><td colspan="8" class="m3-table__empty">Tidak ada data absensi untuk filter ini.</td></tr>
->>>>>>> df20464 (Nambahin Dummy + Ngubah tampilan ke material)
       <?php endif; ?>
       <?php foreach ($absensiList as $a): ?>
         <tr>
           <td><?= formatTanggal($a['tanggal']) ?></td>
           <td><?= badgeTipe($a['tipe']) ?></td>
-<<<<<<< HEAD
-          <td><?= e($a['tipe']==='siswa_pkl' ? $a['nisn'] : $a['nim']) ?></td>
-=======
           <td><?= e($a['tipe'] === 'siswa_pkl' ? $a['nisn'] : $a['nim']) ?></td>
->>>>>>> df20464 (Nambahin Dummy + Ngubah tampilan ke material)
           <td><?= e($a['nama_peserta']) ?></td>
           <td><?= formatJam($a['jam_masuk']) ?></td>
           <td><?= badgeStatusAbsen($a['status_masuk']) ?></td>
@@ -147,14 +100,9 @@ include __DIR__ . '/../includes/header.php';
       </tbody>
     </table>
   </div>
-<<<<<<< HEAD
-</div>
-<p class="text-muted small mt-2">Tabel menampilkan maksimal 300 baris terbaru; kartu ringkasan di atas menghitung seluruh data sesuai filter.</p>
-=======
 </section>
 <p class="m3-body-small m3-muted m3-mt-2">
   Tabel menampilkan maksimal 300 baris terbaru. Kartu ringkasan di atas menghitung seluruh data sesuai filter.
 </p>
->>>>>>> df20464 (Nambahin Dummy + Ngubah tampilan ke material)
 
 <?php include __DIR__ . '/../includes/footer.php'; ?>

@@ -82,37 +82,14 @@ $users = $stmt->fetchAll();
 
 include __DIR__ . '/../includes/header.php';
 ?>
-<<<<<<< HEAD
-<div class="d-flex justify-content-between align-items-center mb-3 flex-wrap gap-2">
-  <h4 class="mb-0">Akun Pengguna</h4>
-  <button class="btn btn-success" data-bs-toggle="modal" data-bs-target="#modalTambahOperator">
-    <i class="bi bi-plus-lg me-1"></i>Tambah Akun Operator
-=======
 <div class="m3-row--between m3-mb-3">
   <h1 class="m3-page-title m3-mb-0">Akun pengguna</h1>
   <button class="m3-fab" data-m3-dialog-open="dialogTambahOperator">
     <span class="m3-icon">person_add</span>Tambah operator
->>>>>>> df20464 (Nambahin Dummy + Ngubah tampilan ke material)
   </button>
 </div>
 
 <?php foreach ($errors as $err): ?>
-<<<<<<< HEAD
-  <div class="alert alert-danger py-2"><?= e($err) ?></div>
-<?php endforeach; ?>
-
-<ul class="nav nav-pills mb-3">
-  <?php foreach (['' => 'Semua', 'operator' => 'Operator', 'dosen' => 'Dosen', 'mahasiswa' => 'Mahasiswa/PKL'] as $val => $label): ?>
-    <li class="nav-item"><a class="nav-link <?= $roleFilter === $val ? 'active' : '' ?>" href="?role=<?= $val ?>"><?= $label ?></a></li>
-  <?php endforeach; ?>
-</ul>
-
-<div class="card border-0 shadow-sm">
-  <div class="table-responsive">
-    <table class="table mb-0 align-middle">
-      <thead><tr><th>Username</th><th>Nama</th><th>Email</th><th>Role</th><th>Status</th><th class="text-end">Aksi</th></tr></thead>
-      <tbody>
-=======
   <div class="m3-banner m3-banner--error">
     <span class="m3-icon">error</span><span class="m3-grow"><?= e($err) ?></span>
   </div>
@@ -137,22 +114,10 @@ include __DIR__ . '/../includes/header.php';
       <?php if (!$users): ?>
         <tr><td colspan="6" class="m3-table__empty">Belum ada akun terdaftar.</td></tr>
       <?php endif; ?>
->>>>>>> df20464 (Nambahin Dummy + Ngubah tampilan ke material)
       <?php foreach ($users as $u): ?>
         <tr>
           <td><?= e($u['username']) ?></td>
           <td><?= e($u['nama']) ?></td>
-<<<<<<< HEAD
-          <td><?= e($u['email'] ?? '-') ?></td>
-          <td><span class="badge text-bg-secondary text-uppercase"><?= e($u['role']) ?></span></td>
-          <td><span class="badge <?= $u['status'] === 'aktif' ? 'text-bg-success' : 'text-bg-danger' ?>"><?= e($u['status']) ?></span></td>
-          <td class="text-end">
-            <a href="?toggle=<?= $u['id'] ?>" class="btn btn-sm btn-outline-secondary" title="Aktif/Nonaktifkan"><i class="bi bi-power"></i></a>
-            <a href="?reset=<?= $u['id'] ?>" class="btn btn-sm btn-outline-warning" title="Reset Password"
-               onclick="return confirm('Reset password akun \'<?= e($u['username']) ?>\' ke password123?');"><i class="bi bi-key"></i></a>
-            <a href="?delete=<?= $u['id'] ?>" class="btn btn-sm btn-outline-danger" title="Hapus Akun"
-               onclick="return confirm('Yakin hapus akun \'<?= e($u['username']) ?>\'?');"><i class="bi bi-trash"></i></a>
-=======
           <td><?= e($u['email'] ?: '-') ?></td>
           <td><span class="m3-badge m3-badge--secondary"><?= e(ucfirst($u['role'])) ?></span></td>
           <td>
@@ -172,39 +137,12 @@ include __DIR__ . '/../includes/header.php';
                onclick="return confirm('Hapus akun \'<?= e($u['username']) ?>\'?');">
               <span class="m3-icon m3-icon--sm">delete</span>
             </a>
->>>>>>> df20464 (Nambahin Dummy + Ngubah tampilan ke material)
           </td>
         </tr>
       <?php endforeach; ?>
       </tbody>
     </table>
   </div>
-<<<<<<< HEAD
-</div>
-
-<div class="modal fade" id="modalTambahOperator" tabindex="-1">
-  <div class="modal-dialog">
-    <form method="post" class="modal-content">
-      <?= csrfField() ?>
-      <input type="hidden" name="action" value="tambah_operator">
-      <div class="modal-header">
-        <h5 class="modal-title">Tambah Akun Operator</h5>
-        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
-      </div>
-      <div class="modal-body">
-        <div class="mb-3"><label class="form-label">Username</label><input type="text" name="username" class="form-control" required></div>
-        <div class="mb-3"><label class="form-label">Nama</label><input type="text" name="nama" class="form-control" required></div>
-        <div class="mb-3"><label class="form-label">Email</label><input type="email" name="email" class="form-control"></div>
-        <div class="form-text">Password default: <code>password123</code></div>
-      </div>
-      <div class="modal-footer">
-        <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">Batal</button>
-        <button type="submit" class="btn btn-success">Simpan</button>
-      </div>
-    </form>
-  </div>
-</div>
-=======
 </section>
 
 <dialog class="m3-dialog" id="dialogTambahOperator">
@@ -233,6 +171,5 @@ include __DIR__ . '/../includes/header.php';
     </div>
   </form>
 </dialog>
->>>>>>> df20464 (Nambahin Dummy + Ngubah tampilan ke material)
 
 <?php include __DIR__ . '/../includes/footer.php'; ?>

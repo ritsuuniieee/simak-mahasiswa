@@ -21,34 +21,6 @@ $kegiatanList = $stmt->fetchAll();
 
 include __DIR__ . '/../includes/header.php';
 ?>
-<<<<<<< HEAD
-<h4 class="mb-3">Rekap Kegiatan Harian</h4>
-
-<form class="row g-2 mb-3">
-  <div class="col-auto flex-grow-1">
-    <input type="text" name="q" class="form-control" placeholder="Cari nama / NIM / NISN / judul kegiatan..." value="<?= e($search) ?>">
-  </div>
-  <div class="col-auto"><button class="btn btn-outline-secondary"><i class="bi bi-search"></i> Cari</button></div>
-</form>
-
-<div class="row g-3">
-<?php if (!$kegiatanList): ?>
-  <p class="text-muted text-center py-4">Belum ada kegiatan tercatat.</p>
-<?php endif; ?>
-<?php foreach ($kegiatanList as $k): ?>
-  <div class="col-md-6">
-    <div class="card border-0 shadow-sm h-100">
-      <div class="card-body">
-        <div class="d-flex justify-content-between">
-          <h6 class="card-title mb-1"><?= e($k['judul']) ?></h6>
-          <small class="text-muted"><?= formatTanggal($k['tanggal']) ?></small>
-        </div>
-        <div class="small text-muted mb-2"><?= e($k['nama_peserta']) ?> &middot; <?= badgeTipe($k['tipe']) ?></div>
-        <p class="card-text mb-0"><?= nl2br(e($k['deskripsi'])) ?></p>
-      </div>
-    </div>
-  </div>
-=======
 <h1 class="m3-page-title">Rekap kegiatan harian</h1>
 
 <form class="m3-toolbar" method="get">
@@ -83,7 +55,6 @@ include __DIR__ . '/../includes/header.php';
       <p class="m3-body-medium m3-mb-0"><?= nl2br(e($k['deskripsi'])) ?></p>
     </div>
   </article>
->>>>>>> df20464 (Nambahin Dummy + Ngubah tampilan ke material)
 <?php endforeach; ?>
 </div>
 

@@ -8,11 +8,7 @@ $id = isset($_GET['id']) ? (int)$_GET['id'] : null;
 $isEdit = $id !== null;
 $pageTitle = $isEdit ? 'Edit Peserta' : 'Tambah Peserta';
 
-<<<<<<< HEAD
-$data = ['tipe' => 'mahasiswa', 'nim' => '', 'nisn' => '', 'nama' => '', 'prodi' => '', 'asal_sekolah' => '', 'no_hp' => '', 'alamat' => '', 'status' => 'aktif', 'foto' => ''];
-=======
 $data = ['tipe' => 'mahasiswa', 'nim' => '', 'nisn' => '', 'nama' => '', 'prodi' => '', 'asal_sekolah' => '', 'jurusan' => '', 'no_hp' => '', 'alamat' => '', 'status' => 'aktif', 'foto' => ''];
->>>>>>> df20464 (Nambahin Dummy + Ngubah tampilan ke material)
 $errors = [];
 
 if ($isEdit) {
@@ -108,68 +104,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
 include __DIR__ . '/../includes/header.php';
 ?>
-<<<<<<< HEAD
-<h4 class="mb-4"><?= e($pageTitle) ?></h4>
-
-<?php foreach ($errors as $err): ?><div class="alert alert-danger py-2"><?= e($err) ?></div><?php endforeach; ?>
-
-<div class="card border-0 shadow-sm">
-  <div class="card-body">
-    <form method="post" enctype="multipart/form-data" novalidate>
-      <?= csrfField() ?>
-      <div class="mb-3">
-        <label class="form-label d-block">Tipe Peserta</label>
-        <div class="btn-group">
-          <input type="radio" class="btn-check" name="tipe" id="tipeMhs" value="mahasiswa" <?= $data['tipe']==='mahasiswa'?'checked':'' ?> onchange="toggleTipe()">
-          <label class="btn btn-outline-success" for="tipeMhs">Mahasiswa</label>
-          <input type="radio" class="btn-check" name="tipe" id="tipePkl" value="siswa_pkl" <?= $data['tipe']==='siswa_pkl'?'checked':'' ?> onchange="toggleTipe()">
-          <label class="btn btn-outline-success" for="tipePkl">Siswa PKL</label>
-        </div>
-      </div>
-
-      <div class="row g-3">
-        <div class="col-md-4">
-          <img id="fotoPreview" src="<?= $data['foto'] ? FOTO_URL . rawurlencode($data['foto']) : '' ?>" class="foto-preview-lg mb-2" style="<?= $data['foto'] ? '' : 'display:none' ?>">
-          <label class="form-label d-block">Foto</label>
-          <input type="file" name="foto" class="form-control" accept=".jpg,.jpeg,.png" onchange="previewFoto(this)">
-        </div>
-        <div class="col-md-8">
-          <div class="row g-3">
-            <div class="col-md-6" id="wrapNim">
-              <label class="form-label">NIM</label>
-              <input type="text" name="nim" class="form-control" value="<?= e($data['nim']) ?>">
-            </div>
-            <div class="col-md-6" id="wrapNisn" style="display:none">
-              <label class="form-label">NISN</label>
-              <input type="text" name="nisn" class="form-control" value="<?= e($data['nisn']) ?>">
-            </div>
-            <div class="col-12">
-              <label class="form-label">Nama Lengkap</label>
-              <input type="text" name="nama" class="form-control" required value="<?= e($data['nama']) ?>">
-            </div>
-            <div class="col-md-6" id="wrapProdi">
-              <label class="form-label" id="labelProdi">Program Studi</label>
-                    <select name="prodi" class="form-select">
-                        <?php foreach (['Sistem Informasi','Teknik Informatika'] as $st): ?>
-                        <option value="<?= $st ?>" <?= $data['prodi'] === $st ? 'selected' : '' ?>><?= ucfirst($st) ?>
-                        </option>
-                        <?php endforeach; ?>
-                    </select>
-            </div>
-            <div class="col-12" id="wrapJurusan">
-              <label class="form-label">Jurusan</label>
-              <input type="text" name="jurusan" class="form-control" required value="<?= e($data['jurusan']) ?>">
-            </div>
-            <div class="col-md-6" id="wrapAsalSekolah" style="display:none">
-              <label class="form-label">Asal Sekolah</label>
-              <input type="text" name="asal_sekolah" class="form-control" value="<?= e($data['asal_sekolah']) ?>">
-            </div>
-            <div class="col-md-6">
-              <label class="form-label">Status</label>
-              <select name="status" class="form-select">
-                <?php foreach (['aktif','cuti','lulus','selesai','nonaktif'] as $st): ?>
-                  <option value="<?= $st ?>" <?= $data['status']===$st?'selected':'' ?>><?= ucfirst($st) ?></option>
-=======
 <h1 class="m3-page-title"><?= e($pageTitle) ?></h1>
 
 <?php foreach ($errors as $err): ?>
@@ -238,35 +172,11 @@ include __DIR__ . '/../includes/header.php';
               <select id="status" name="status" class="m3-select">
                 <?php foreach (['aktif','cuti','lulus','selesai','nonaktif'] as $st): ?>
                   <option value="<?= $st ?>" <?= $data['status'] === $st ? 'selected' : '' ?>><?= ucfirst($st) ?></option>
->>>>>>> df20464 (Nambahin Dummy + Ngubah tampilan ke material)
                 <?php endforeach; ?>
               </select>
             </div>
           </div>
         </div>
-<<<<<<< HEAD
-        <div class="col-md-6">
-          <label class="form-label">No. HP</label>
-          <input type="text" name="no_hp" class="form-control" value="<?= e($data['no_hp']) ?>">
-        </div>
-        <div class="col-12">
-          <label class="form-label">Alamat</label>
-          <textarea name="alamat" class="form-control" rows="2"><?= e($data['alamat']) ?></textarea>
-        </div>
-      </div>
-
-      <div class="mt-4 d-flex gap-2">
-        <button type="submit" class="btn btn-success"><i class="bi bi-check-lg me-1"></i>Simpan</button>
-        <a href="<?= BASE_URL ?>/dosen/mahasiswa.php" class="btn btn-outline-secondary">Batal</a>
-      </div>
-    </form>
-  </div>
-</div>
-
-<script>
-function toggleTipe() {
-  const isPkl = document.getElementById('tipePkl').checked;
-=======
 
         <div class="m3-col-6">
           <label class="m3-field__label" for="no_hp">No. HP</label>
@@ -291,7 +201,6 @@ function toggleTipe() {
 <script>
 function toggleTipe() {
   var isPkl = document.getElementById('tipePkl').checked;
->>>>>>> df20464 (Nambahin Dummy + Ngubah tampilan ke material)
   document.getElementById('wrapNim').style.display = isPkl ? 'none' : 'block';
   document.getElementById('wrapNisn').style.display = isPkl ? 'block' : 'none';
   document.getElementById('wrapAsalSekolah').style.display = isPkl ? 'block' : 'none';
@@ -299,16 +208,11 @@ function toggleTipe() {
   document.getElementById('wrapJurusan').style.display = isPkl ? 'block' : 'none';
 }
 function previewFoto(input) {
-<<<<<<< HEAD
-  const preview = document.getElementById('fotoPreview');
-  if (input.files && input.files[0]) { preview.src = URL.createObjectURL(input.files[0]); preview.style.display='block'; }
-=======
   var preview = document.getElementById('fotoPreview');
   if (input.files && input.files[0]) {
     preview.src = URL.createObjectURL(input.files[0]);
     preview.style.display = 'block';
   }
->>>>>>> df20464 (Nambahin Dummy + Ngubah tampilan ke material)
 }
 toggleTipe();
 </script>

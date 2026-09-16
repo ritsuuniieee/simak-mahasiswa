@@ -39,39 +39,6 @@ $totalSertifikat = $pdo->query("SELECT COUNT(*) FROM sertifikat")->fetchColumn()
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<<<<<<< HEAD
-<title>Portal Publik | SIMAK Mahasiswa & PKL</title>
-<link href="<?= BASE_URL ?>/assets/vendor/bootstrap/css/bootstrap.min.css" rel="stylesheet">
-<link href="<?= BASE_URL ?>/assets/vendor/bootstrap-icons/bootstrap-icons.css" rel="stylesheet">
-<link href="<?= BASE_URL ?>/assets/css/style.css" rel="stylesheet">
-</head>
-<body class="login-wrapper login-page">
-  <div class="card login-card p-4" style="max-width:480px">
-    <div class="text-center mb-3">
-      <img src="<?= BASE_URL ?>/assets/images/logo-stikom.png" alt="" height="60" class="mb-2">
-      <h4 class="mt-2 mb-0 fw-bold">Portal Mahasiswa &amp; Siswa PKL</h4>
-      <small class="text-muted">Absensi &middot; Kegiatan Harian &middot; Sertifikat</small>
-    </div>
-
-    <div class="row text-center g-2 mb-3">
-      <div class="col-4">
-        <div class="border rounded p-2">
-          <div class="fw-bold fs-5"><?= (int)$totalMhs ?></div>
-          <div class="small text-muted">Mahasiswa</div>
-        </div>
-      </div>
-      <div class="col-4">
-        <div class="border rounded p-2">
-          <div class="fw-bold fs-5"><?= (int)$totalPkl ?></div>
-          <div class="small text-muted">Siswa PKL</div>
-        </div>
-      </div>
-      <div class="col-4">
-        <div class="border rounded p-2">
-          <div class="fw-bold fs-5"><?= (int)$totalSertifikat ?></div>
-          <div class="small text-muted">Sertifikat</div>
-        </div>
-=======
 <meta name="theme-color" content="#fbebe2">
 <title>Portal Peserta | SIMAK Mahasiswa &amp; PKL</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -100,38 +67,18 @@ $totalSertifikat = $pdo->query("SELECT COUNT(*) FROM sertifikat")->fetchColumn()
       <div class="m3-metric">
         <div class="m3-metric__value"><?= (int)$totalSertifikat ?></div>
         <div class="m3-metric__label">Sertifikat</div>
->>>>>>> df20464 (Nambahin Dummy + Ngubah tampilan ke material)
       </div>
     </div>
 
     <?php if ($error): ?>
-<<<<<<< HEAD
-      <div class="alert alert-danger py-2"><?= e($error) ?></div>
-=======
       <div class="m3-banner m3-banner--error">
         <span class="m3-icon">error</span>
         <span class="m3-grow"><?= e($error) ?></span>
       </div>
->>>>>>> df20464 (Nambahin Dummy + Ngubah tampilan ke material)
     <?php endif; ?>
 
     <form method="post">
       <?= csrfField() ?>
-<<<<<<< HEAD
-      <label class="form-label">Masukkan NIM atau NISN Anda</label>
-      <input type="text" name="identitas" class="form-control mb-3" required autofocus>
-      <button type="submit" class="btn btn-success w-100">
-        <i class="bi bi-box-arrow-in-right me-1"></i>Masuk ke Portal
-      </button>
-    </form>
-
-    <p class="text-center mt-3 mb-0">
-      <a href="<?= BASE_URL ?>/login.php" class="btn btn-outline-primary w-100">
-        <i class="bi bi-box-arrow-in-right me-1"></i>Login sebagai Operator / Dosen
-      </a>
-    </p>
-  </div>
-=======
       <div class="m3-field m3-mb-3">
         <label class="m3-field__label" for="identitas">NIM atau NISN</label>
         <input id="identitas" type="text" name="identitas" class="m3-input" required autofocus
@@ -151,6 +98,5 @@ $totalSertifikat = $pdo->query("SELECT COUNT(*) FROM sertifikat")->fetchColumn()
   </main>
 
   <script src="<?= BASE_URL ?>/assets/js/material3.js"></script>
->>>>>>> df20464 (Nambahin Dummy + Ngubah tampilan ke material)
 </body>
 </html>
