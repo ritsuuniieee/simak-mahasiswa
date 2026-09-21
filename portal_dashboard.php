@@ -73,6 +73,34 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && ($_POST['aksi'] ?? '') === 'kegiata
     }
 }
 
+// ==== Aksi: Atur / Ganti password portal (hash) ====
+$hasPwCol = hasMahasiswaPasswordColumn($pdo);
+if ($hasPwCol && $_SERVER['REQUEST_METHOD'] === 'POST' && ($_POST['aksi'] ?? '') === 'password') {
+    if (!csrfValid()) {
+        $flashLocal = 'Sesi form kadaluarsa, coba lagi.'; $flashType = 'danger';
+    } else {
+        $pwLama = $_POST['password_lama'] ?? '';
+        $pwBaru = $_POST['password_baru'] ?? '';
+        $pwKonf = $_POST['password_konfirmasi'] ?? '';
+        $hashLama = $peserta['password'] ?? null;
+        if (strlen($pwBaru) < 6) {
+            $flashLocal = 'Password baru minimal 6 karakter.'; $flashType = 'danger';
+        } elseif ($pwBaru !== $pwKonf) {
+            $flashLocal = 'Konfirmasi password baru tidak cocok.'; $flashType = 'danger';
+        } elseif (!empty($hashLama) && !password_verify($pwLama, $hashLama)) {
+            $flashLocal = 'Password lama salah.'; $flashType = 'danger';
+        } else {
+            $stmt = $pdo->prepare('UPDATE mahasiswa SET password = ? WHERE id = ?');
+            $stmt->execute([password_hash($pwBaru, PASSWORD_DEFAULT), $pesertaId]);
+            unset($_SESSION['portal_perlu_password']);
+            $stmt = $pdo->prepare('SELECT m.*, d.nama AS nama_dosen FROM mahasiswa m LEFT JOIN dosen d ON d.id = m.dosen_id WHERE m.id = ?');
+            $stmt->execute([$pesertaId]);
+            $peserta = $stmt->fetch();
+            $flashLocal = 'Password portal berhasil disimpan.';
+        }
+    }
+}
+
 // Ambil ulang data absensi hari ini (setelah kemungkinan update)
 $stmt = $pdo->prepare('SELECT * FROM absensi WHERE mahasiswa_id = ? AND tanggal = ?');
 $stmt->execute([$pesertaId, $today]);
@@ -92,6 +120,20 @@ $rekap = $rekap->fetch();
 $stmt = $pdo->prepare('SELECT * FROM absensi WHERE mahasiswa_id = ? ORDER BY tanggal DESC LIMIT 15');
 $stmt->execute([$pesertaId]);
 $riwayatAbsen = $stmt->fetchAll();
+
+// Filter & pengelompokan bulanan untuk riwayat
+$bulanFilter = $_GET['bulan'] ?? '';
+if (!validBulan($bulanFilter)) $bulanFilter = '';
+if ($bulanFilter !== '') {
+    $stmt = $pdo->prepare("SELECT * FROM absensi WHERE mahasiswa_id = ? AND DATE_FORMAT(tanggal,'%Y-%m') = ? ORDER BY tanggal DESC");
+    $stmt->execute([$pesertaId, $bulanFilter]);
+    $riwayatAbsen = $stmt->fetchAll();
+}
+$stmt = $pdo->prepare("SELECT DATE_FORMAT(tanggal,'%Y-%m') AS bulan, COUNT(*) AS total, SUM(status_masuk='tepat_waktu') AS tepat, SUM(status_masuk='terlambat') AS terlambat FROM absensi WHERE mahasiswa_id = ? GROUP BY DATE_FORMAT(tanggal,'%Y-%m') ORDER BY bulan DESC");
+$stmt->execute([$pesertaId]);
+$rekapBulanan = $stmt->fetchAll();
+
+$nilaiSaya = ambilNilai($pdo, $pesertaId);
 
 $stmt = $pdo->prepare('SELECT * FROM kegiatan_harian WHERE mahasiswa_id = ? ORDER BY tanggal DESC, created_at DESC LIMIT 10');
 $stmt->execute([$pesertaId]);
@@ -190,6 +232,13 @@ $sertifikatList = $stmt->fetchAll();
     </div>
   </div>
 
+  <?php if (!empty($_SESSION['portal_perlu_password']) || ($hasPwCol && empty($peserta['password']))): ?>
+    <div class="m3-banner m3-banner--warning m3-mb-3">
+      <span class="m3-icon">lock</span>
+      <span class="m3-grow">Akun portal Anda belum punya password. Buat password sekarang agar NIM/NISN Anda tidak disalahgunakan.</span>
+    </div>
+  <?php endif; ?>
+
   <!-- Absensi hari ini -->
   <section class="m3-card m3-card--elevated m3-mb-3">
     <div class="m3-card__header">Absensi hari ini &mdash; <?= formatTanggal($today) ?></div>
@@ -229,6 +278,26 @@ $sertifikatList = $stmt->fetchAll();
       </div>
 
       <h2 class="m3-title-medium m3-mt-3 m3-mb-2">Riwayat absensi terakhir</h2>
+      <form method="get" class="m3-toolbar m3-mb-2">
+        <input type="month" name="bulan" class="m3-input" style="width:auto" value="<?= e($bulanFilter) ?>">
+        <button class="m3-btn m3-btn--tonal m3-btn--sm"><span class="m3-icon m3-icon--sm">filter_alt</span>Filter bulan</button>
+        <?php if ($bulanFilter): ?><a href="portal_dashboard.php" class="m3-btn m3-btn--text m3-btn--sm">Atur ulang</a><?php endif; ?>
+      </form>
+      <?php if ($rekapBulanan): ?>
+      <div class="m3-table-scroll m3-mb-2">
+        <table class="m3-table">
+          <thead><tr><th>Bulan</th><th>Hadir</th><th>Tepat waktu</th><th>Terlambat</th></tr></thead>
+          <tbody>
+            <?php foreach ($rekapBulanan as $rb): ?>
+            <tr>
+              <td><a href="portal_dashboard.php?bulan=<?= e($rb['bulan']) ?>"><?= e(formatBulanId($rb['bulan'])) ?></a></td>
+              <td><?= (int)$rb['total'] ?></td><td><?= (int)$rb['tepat'] ?></td><td><?= (int)$rb['terlambat'] ?></td>
+            </tr>
+            <?php endforeach; ?>
+          </tbody>
+        </table>
+      </div>
+      <?php endif; ?>
       <div class="m3-table-scroll">
         <table class="m3-table">
           <thead>
@@ -293,7 +362,7 @@ $sertifikatList = $stmt->fetchAll();
 
   <!-- Sertifikat -->
   <section class="m3-card m3-card--elevated">
-    <div class="m3-card__header">Sertifikat saya</div>
+    <div class="m3-card__header">Sertifikat saya<?= $nilaiSaya ? ' &middot; Nilai: ' . e($nilaiSaya['nilai_angka']) . ' (' . e($nilaiSaya['nilai_huruf']) . ' - ' . e($nilaiSaya['predikat']) . ')' : '' ?></div>
     <div class="m3-card__body">
       <?php if (!$sertifikatList): ?>
         <p class="m3-body-medium m3-muted m3-mb-0">
@@ -314,6 +383,10 @@ $sertifikatList = $stmt->fetchAll();
                    class="m3-icon-btn m3-icon-btn--primary" title="Unduh sertifikat" aria-label="Unduh sertifikat">
                   <span class="m3-icon">download</span>
                 </a>
+                <a href="<?= BASE_URL ?>/cetak_sertifikat.php?peserta_id=<?= (int)$pesertaId ?>&s_id=<?= (int)$s['id'] ?>" target="_blank"
+                   class="m3-icon-btn" title="Pratinjau & unduh PNG (html2canvas)" aria-label="Cetak sertifikat">
+                  <span class="m3-icon">print</span>
+                </a>
               </div>
             </div>
           </div>
@@ -323,9 +396,42 @@ $sertifikatList = $stmt->fetchAll();
     </div>
   </section>
 
+  <?php if ($hasPwCol): ?>
+  <!-- Keamanan portal -->
+  <section class="m3-card m3-card--elevated m3-mt-3">
+    <div class="m3-card__header">Password portal</div>
+    <div class="m3-card__body">
+      <form method="post" class="m3-grid">
+        <?= csrfField() ?>
+        <input type="hidden" name="aksi" value="password">
+        <?php if (!empty($peserta['password'])): ?>
+        <div class="m3-col-4">
+          <label class="m3-field__label" for="password_lama">Password lama</label>
+          <input id="password_lama" type="password" name="password_lama" class="m3-input" autocomplete="current-password">
+        </div>
+        <?php endif; ?>
+        <div class="m3-col-4">
+          <label class="m3-field__label" for="password_baru">Password baru</label>
+          <input id="password_baru" type="password" name="password_baru" class="m3-input" required minlength="6" autocomplete="new-password">
+        </div>
+        <div class="m3-col-4">
+          <label class="m3-field__label" for="password_konfirmasi">Ulangi password baru</label>
+          <input id="password_konfirmasi" type="password" name="password_konfirmasi" class="m3-input" required autocomplete="new-password">
+        </div>
+        <div class="m3-col-12">
+          <button type="submit" class="m3-btn m3-btn--filled m3-btn--sm"><span class="m3-icon m3-icon--sm">lock</span>Simpan password</button>
+        </div>
+      </form>
+    </div>
+  </section>
+  <?php endif; ?>
+
 </main>
 
 <footer class="m3-footer">&copy; <?= date('Y') ?> STIKOM 22 Januari</footer>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/ScrollTrigger.min.js"></script>
 <script src="<?= BASE_URL ?>/assets/js/material3.js"></script>
+<script src="<?= BASE_URL ?>/assets/js/animasi.js"></script>
 </body>
 </html>

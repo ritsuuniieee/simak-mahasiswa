@@ -7,6 +7,15 @@ $pageTitle = 'Data Dosen';
 
 if (isset($_GET['delete'])) {
     $id = (int)$_GET['delete'];
+    if (hasDosenFotoColumn($pdo)) {
+        $stmt = $pdo->prepare('SELECT foto FROM dosen WHERE id = ?');
+        $stmt->execute([$id]);
+        $foto = $stmt->fetchColumn();
+        if ($foto) {
+            if (is_file(DOSEN_FOTO_DIR . $foto)) @unlink(DOSEN_FOTO_DIR . $foto);
+            if (is_file(FOTO_DIR . $foto)) @unlink(FOTO_DIR . $foto);
+        }
+    }
     $stmt = $pdo->prepare('DELETE FROM dosen WHERE id = ?');
     $stmt->execute([$id]);
     setFlash('success', 'Data dosen berhasil dihapus.');
@@ -15,6 +24,7 @@ if (isset($_GET['delete'])) {
 }
 
 $search = trim($_GET['q'] ?? '');
+$hasFotoCol = hasDosenFotoColumn($pdo);
 $sql = "SELECT d.*, (SELECT COUNT(*) FROM mahasiswa m WHERE m.dosen_id = d.id) AS jumlah_bimbingan FROM dosen d";
 $params = [];
 if ($search !== '') {
@@ -46,14 +56,21 @@ include __DIR__ . '/../includes/header.php';
   <div class="m3-table-scroll">
     <table class="m3-table">
       <thead>
-        <tr><th>NIDN / NIDK</th><th>Nama</th><th>No. HP</th><th>Bimbingan</th><th class="m3-td-actions">Aksi</th></tr>
+        <tr><th>Foto</th><th>NIDN / NIDK</th><th>Nama</th><th>No. HP</th><th>Bimbingan</th><th class="m3-td-actions">Aksi</th></tr>
       </thead>
       <tbody>
       <?php if (!$dosenList): ?>
-        <tr><td colspan="5" class="m3-table__empty">Belum ada dosen terdaftar.</td></tr>
+        <tr><td colspan="6" class="m3-table__empty">Belum ada dosen terdaftar.</td></tr>
       <?php endif; ?>
       <?php foreach ($dosenList as $d): ?>
         <tr>
+          <td>
+            <?php if ($hasFotoCol && !empty($d['foto'])): ?>
+              <img src="<?= fotoDosenUrl($d['foto']) ?>" alt="" class="m3-avatar">
+            <?php else: ?>
+              <div class="m3-avatar"><span class="m3-icon">person</span></div>
+            <?php endif; ?>
+          </td>
           <td><?= e($d['nidn_nidk']) ?></td>
           <td><?= e($d['nama']) ?></td>
           <td><?= e($d['no_hp'] ?: '-') ?></td>

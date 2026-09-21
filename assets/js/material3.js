@@ -44,6 +44,26 @@
     });
   });
 
+  /* ---- Tabel responsif: suntik label kolom untuk mode kartu di mobile ----
+     CSS di bawah (max-width 640px) menampilkan tiap baris sebagai kartu
+     dengan label dari atribut data-label ini. Kolom aksi & sel colspan
+     (baris kosong) tidak diberi label. */
+  document.querySelectorAll('table.m3-table').forEach(function (table) {
+    var headCells = table.querySelectorAll('thead th');
+    if (!headCells.length) return;
+    var labels = [];
+    headCells.forEach(function (th) { labels.push(th.textContent.trim()); });
+    table.querySelectorAll('tbody tr').forEach(function (tr) {
+      var cells = tr.cells;
+      for (var i = 0; i < cells.length; i++) {
+        var td = cells[i];
+        if (td.hasAttribute('colspan')) continue;
+        if (td.classList.contains('m3-td-actions')) continue;
+        if (labels[i]) td.setAttribute('data-label', labels[i]);
+      }
+    });
+  });
+
   /* ---- Esc menutup drawer ---- */
   document.addEventListener('keydown', function (ev) {
     if (ev.key === 'Escape') closeDrawer();

@@ -5,6 +5,8 @@ requireRole(['operator']);
 
 $pageTitle = 'Data Mahasiswa & Siswa PKL';
 
+$hasPwCol = hasMahasiswaPasswordColumn($pdo);
+
 if (isset($_GET['delete'])) {
     $id = (int)$_GET['delete'];
     $stmt = $pdo->prepare('SELECT foto FROM mahasiswa WHERE id = ?');
@@ -16,6 +18,15 @@ if (isset($_GET['delete'])) {
     $stmt = $pdo->prepare('DELETE FROM mahasiswa WHERE id = ?');
     $stmt->execute([$id]);
     setFlash('success', 'Data berhasil dihapus.');
+    header('Location: ' . BASE_URL . '/operator/mahasiswa.php');
+    exit;
+}
+
+if ($hasPwCol && isset($_GET['reset_pw'])) {
+    $id = (int)$_GET['reset_pw'];
+    $stmt = $pdo->prepare('UPDATE mahasiswa SET password = NULL WHERE id = ?');
+    $stmt->execute([$id]);
+    setFlash('success', 'Password portal peserta dikosongkan. Peserta dapat masuk dengan NIM/NISN lalu membuat password baru.');
     header('Location: ' . BASE_URL . '/operator/mahasiswa.php');
     exit;
 }
@@ -43,9 +54,20 @@ include __DIR__ . '/../includes/header.php';
 ?>
 <div class="m3-row--between m3-mb-3">
   <h1 class="m3-page-title m3-mb-0">Mahasiswa &amp; siswa PKL</h1>
-  <a href="<?= BASE_URL ?>/operator/mahasiswa_form.php" class="m3-fab">
-    <span class="m3-icon">person_add</span>Tambah peserta
-  </a>
+  <div class="m3-row m3-gap-sm" style="flex-wrap:wrap">
+    <a href="<?= BASE_URL ?>/operator/mahasiswa_template.php" class="m3-btn m3-btn--outlined m3-btn--sm">
+      <span class="m3-icon m3-icon--sm">description</span>Template
+    </a>
+    <a href="<?= BASE_URL ?>/operator/mahasiswa_export.php?tipe=<?= e($tipeFilter) ?>&q=<?= urlencode($search) ?>" class="m3-btn m3-btn--outlined m3-btn--sm">
+      <span class="m3-icon m3-icon--sm">download</span>Ekspor
+    </a>
+    <a href="<?= BASE_URL ?>/operator/mahasiswa_import.php" class="m3-btn m3-btn--tonal m3-btn--sm">
+      <span class="m3-icon m3-icon--sm">upload</span>Impor
+    </a>
+    <a href="<?= BASE_URL ?>/operator/mahasiswa_form.php" class="m3-fab">
+      <span class="m3-icon">person_add</span>Tambah peserta
+    </a>
+  </div>
 </div>
 
 <div class="m3-chipset">
@@ -98,10 +120,17 @@ include __DIR__ . '/../includes/header.php';
           <td><?= e($m['nama_dosen'] ?? '-') ?></td>
           <td><?= badgeStatusPeserta($m['status']) ?></td>
           <td class="m3-td-actions">
-            <a href="<?= BASE_URL ?>/operator/mahasiswa_form.php?id=<?= $m['id'] ?>"
+            <a href="<?= BASE_URL ?>/operator/mahasiswa_edit.php?id=<?= $m['id'] ?>"
                class="m3-icon-btn m3-icon-btn--primary" title="Ubah data" aria-label="Ubah data">
               <span class="m3-icon m3-icon--sm">edit</span>
             </a>
+            <?php if ($hasPwCol): ?>
+            <a href="<?= BASE_URL ?>/operator/mahasiswa.php?reset_pw=<?= $m['id'] ?>"
+               class="m3-icon-btn" title="Kosongkan password portal (<?= !empty($m['password']) ? 'sudah ada' : 'belum ada' ?>)" aria-label="Reset password portal"
+               onclick="return confirm('Kosongkan password portal \'<?= e($m['nama']) ?>\'?');">
+              <span class="m3-icon m3-icon--sm">key</span>
+            </a>
+            <?php endif; ?>
             <a href="<?= BASE_URL ?>/operator/mahasiswa.php?delete=<?= $m['id'] ?>"
                class="m3-icon-btn m3-icon-btn--danger" title="Hapus data" aria-label="Hapus data"
                onclick="return confirm('Hapus data \'<?= e($m['nama']) ?>\'? Absensi, kegiatan, dan sertifikat peserta ini ikut terhapus.');">

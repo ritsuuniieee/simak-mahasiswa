@@ -22,6 +22,7 @@ function navItem(string $href, string $icon, string $label, string $current, str
     <div class="m3-drawer__section">Rekap</div>
     <?= navItem(BASE_URL.'/operator/absensi_rekap.php', 'event_available', 'Absensi', $current, 'absensi_rekap.php') ?>
     <?= navItem(BASE_URL.'/operator/kegiatan_rekap.php', 'edit_note', 'Kegiatan harian', $current, 'kegiatan_rekap.php') ?>
+    <?= navItem(BASE_URL.'/operator/nilai.php', 'grade', 'Nilai', $current, 'nilai.php') ?>
     <?= navItem(BASE_URL.'/operator/sertifikat_rekap.php', 'workspace_premium', 'Sertifikat', $current, 'sertifikat_rekap.php') ?>
 
     <div class="m3-drawer__section">Akun</div>

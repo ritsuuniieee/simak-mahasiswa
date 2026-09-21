@@ -124,3 +124,107 @@ function fotoUrl(?string $foto): string {
     $svg = '<svg xmlns="http://www.w3.org/2000/svg" width="120" height="120"><rect width="120" height="120" fill="%23e9e0d8"/><circle cx="60" cy="45" r="22" fill="%23613b18" fill-opacity="0.35"/><rect x="20" y="75" width="80" height="45" rx="20" fill="%23613b18" fill-opacity="0.35"/></svg>';
     return 'data:image/svg+xml,' . $svg;
 }
+
+// ================================================================
+// Helper Kompatibilitas Skema (localhost boleh belum/di-upgrade)
+// ================================================================
+
+/** Cek apakah sebuah kolom ada di tabel (cache per-request). */
+function tableHasColumn(PDO $pdo, string $table, string $column): bool {
+    static $cache = [];
+    $key = $table . '.' . $column;
+    if (!array_key_exists($key, $cache)) {
+        try {
+            $stmt = $pdo->prepare('SELECT COUNT(*) FROM information_schema.COLUMNS WHERE TABLE_SCHEMA = DATABASE() AND TABLE_NAME = ? AND COLUMN_NAME = ?');
+            $stmt->execute([$table, $column]);
+            $cache[$key] = ((int)$stmt->fetchColumn()) > 0;
+        } catch (Throwable $e) {
+            // Fallback: anggap tidak ada agar query tetap aman
+            $cache[$key] = false;
+        }
+    }
+    return $cache[$key];
+}
+
+function hasMahasiswaPasswordColumn(PDO $pdo): bool {
+    return tableHasColumn($pdo, 'mahasiswa', 'password');
+}
+
+function hasDosenFotoColumn(PDO $pdo): bool {
+    return tableHasColumn($pdo, 'dosen', 'foto');
+}
+
+function hasNilaiTable(PDO $pdo): bool {
+    static $cache = null;
+    if ($cache === null) {
+        try {
+            $stmt = $pdo->prepare('SELECT COUNT(*) FROM information_schema.TABLES WHERE TABLE_SCHEMA = DATABASE() AND TABLE_NAME = ?');
+            $stmt->execute(['nilai']);
+            $cache = ((int)$stmt->fetchColumn()) > 0;
+        } catch (Throwable $e) {
+            $cache = false;
+        }
+    }
+    return $cache;
+}
+
+/** URL foto dosen: dukung kolom baru `dosen.foto` + fallback placeholder. */
+function fotoDosenUrl(?string $foto): string {
+    if ($foto) {
+        if (defined('DOSEN_FOTO_DIR') && is_file(DOSEN_FOTO_DIR . $foto)) {
+            return DOSEN_FOTO_URL . rawurlencode($foto);
+        }
+        if (is_file(FOTO_DIR . $foto)) {
+            return FOTO_URL . rawurlencode($foto);
+        }
+    }
+    $svg = '<svg xmlns="http://www.w3.org/2000/svg" width="120" height="120"><rect width="120" height="120" fill="%23dfe7f5"/><circle cx="60" cy="45" r="22" fill="%231c3d6e" fill-opacity="0.35"/><rect x="20" y="75" width="80" height="45" rx="20" fill="%231c3d6e" fill-opacity="0.35"/></svg>';
+    return 'data:image/svg+xml,' . $svg;
+}
+
+// ================================================================
+// Helper Bulan / Nilai / Sertifikat
+// ================================================================
+
+/** Validasi format bulan YYYY-MM. */
+function validBulan(?string $bulan): bool {
+    return is_string($bulan) && preg_match('/^\d{4}-(0[1-9]|1[0-2])$/', $bulan) === 1;
+}
+
+/** Format YYYY-MM -> "September 2026". */
+function formatBulanId(?string $bulan): string {
+    if (!validBulan($bulan)) return '-';
+    static $nama = [1=>'Januari',2=>'Februari',3=>'Maret',4=>'April',5=>'Mei',6=>'Juni',7=>'Juli',8=>'Agustus',9=>'September',10=>'Oktober',11=>'November',12=>'Desember'];
+    [$y, $m] = explode('-', $bulan);
+    return $nama[(int)$m] . ' ' . $y;
+}
+
+/** Konversi nilai angka -> huruf + predikat (skala umum). */
+function nilaiHurufPredikat(float $angka): array {
+    if ($angka >= 85) return ['A', 'Sangat Baik'];
+    if ($angka >= 75) return ['B', 'Baik'];
+    if ($angka >= 65) return ['C', 'Cukup'];
+    if ($angka >= 55) return ['D', 'Kurang'];
+    return ['E', 'Sangat Kurang'];
+}
+
+/** Rekap kehadiran satu peserta (dipakai sertifikat html2canvas & publik). */
+function rekapKehadiran(PDO $pdo, int $pesertaId): array {
+    $stmt = $pdo->prepare("SELECT COUNT(*) AS total, SUM(status_masuk='tepat_waktu') AS tepat, SUM(status_masuk='terlambat') AS terlambat, SUM(status_keluar='sesuai_jadwal') AS sesuai FROM absensi WHERE mahasiswa_id = ?");
+    $stmt->execute([$pesertaId]);
+    $r = $stmt->fetch() ?: [];
+    $total = (int)($r['total'] ?? 0);
+    $tepat = (int)($r['tepat'] ?? 0);
+    $terlambat = (int)($r['terlambat'] ?? 0);
+    $persen = $total > 0 ? round($tepat / $total * 100, 1) : 0;
+    return ['total' => $total, 'tepat' => $tepat, 'terlambat' => $terlambat, 'sesuai' => (int)($r['sesuai'] ?? 0), 'persen_tepat' => $persen];
+}
+
+/** Ambil nilai satu peserta; null bila tabel/belum ada nilai. */
+function ambilNilai(PDO $pdo, int $pesertaId): ?array {
+    if (!hasNilaiTable($pdo)) return null;
+    $stmt = $pdo->prepare('SELECT * FROM nilai WHERE mahasiswa_id = ? LIMIT 1');
+    $stmt->execute([$pesertaId]);
+    $row = $stmt->fetch();
+    return $row ?: null;
+}

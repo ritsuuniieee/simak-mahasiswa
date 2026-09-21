@@ -6,6 +6,7 @@ requireRole(['operator']);
 $pageTitle = 'Sertifikat';
 $allowedExt = ['pdf', 'jpg', 'jpeg', 'png'];
 $maxSize = 5 * 1024 * 1024;
+$hasNomorCol = tableHasColumn($pdo, 'sertifikat', 'nomor');
 
 if (isset($_GET['delete'])) {
     $id = (int)$_GET['delete'];
@@ -27,6 +28,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     } else {
         $mahasiswaId = (int)($_POST['mahasiswa_id'] ?? 0);
         $judul = trim($_POST['judul'] ?? '');
+        $nomor = trim($_POST['nomor'] ?? '');
 
         if (!$mahasiswaId) $errors[] = 'Pilih mahasiswa/siswa PKL pemilik sertifikat.';
         if ($judul === '') $errors[] = 'Judul sertifikat wajib diisi.';
@@ -45,8 +47,13 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             if (!is_dir(UPLOAD_DIR)) mkdir(UPLOAD_DIR, 0775, true);
             $safeName = 'sertifikat_' . $mahasiswaId . '_' . time() . '_' . bin2hex(random_bytes(4)) . '.' . $ext;
             if (move_uploaded_file($_FILES['file']['tmp_name'], UPLOAD_DIR . $safeName)) {
-                $stmt = $pdo->prepare('INSERT INTO sertifikat (mahasiswa_id, judul, file_path, diupload_oleh) VALUES (?,?,?,"operator")');
-                $stmt->execute([$mahasiswaId, $judul, $safeName]);
+                if ($hasNomorCol) {
+                    $stmt = $pdo->prepare('INSERT INTO sertifikat (mahasiswa_id, judul, nomor, file_path, diupload_oleh) VALUES (?,?,?,?,"operator")');
+                    $stmt->execute([$mahasiswaId, $judul, $nomor ?: null, $safeName]);
+                } else {
+                    $stmt = $pdo->prepare('INSERT INTO sertifikat (mahasiswa_id, judul, file_path, diupload_oleh) VALUES (?,?,?,"operator")');
+                    $stmt->execute([$mahasiswaId, $judul, $safeName]);
+                }
                 setFlash('success', 'Sertifikat berhasil diunggah.');
                 header('Location: ' . BASE_URL . '/operator/sertifikat_rekap.php');
                 exit;
@@ -86,11 +93,11 @@ include __DIR__ . '/../includes/header.php';
 <section class="m3-card m3-card--filled m3-mb-4">
   <div class="m3-card__header">Unggah sertifikat</div>
   <div class="m3-card__body">
-    <p class="m3-body-medium m3-muted">Sertifikat yang diunggah di sini langsung tampil di portal peserta yang bersangkutan.</p>
+    <p class="m3-body-medium m3-muted">Sertifikat yang diunggah di sini langsung tampil di portal peserta yang bersangkutan. Nomor sertifikat &amp; desain cetak (html2canvas) memakai rekapan kehadiran + nilai.</p>
     <form method="post" enctype="multipart/form-data">
       <?= csrfField() ?>
       <div class="m3-grid">
-        <div class="m3-col-4">
+        <div class="m3-col-3">
           <label class="m3-field__label" for="mahasiswa_id">Pemilik sertifikat</label>
           <select id="mahasiswa_id" name="mahasiswa_id" class="m3-select" required>
             <option value="">Pilih peserta</option>
@@ -101,12 +108,19 @@ include __DIR__ . '/../includes/header.php';
             <?php endforeach; ?>
           </select>
         </div>
-        <div class="m3-col-4">
+        <div class="m3-col-3">
           <label class="m3-field__label" for="judul">Judul sertifikat</label>
           <input id="judul" type="text" name="judul" class="m3-input" required
                  placeholder="Contoh: Sertifikat PKL semester genap">
         </div>
-        <div class="m3-col-4">
+        <?php if ($hasNomorCol): ?>
+        <div class="m3-col-3">
+          <label class="m3-field__label" for="nomor">Nomor sertifikat</label>
+          <input id="nomor" type="text" name="nomor" class="m3-input"
+                 placeholder="Contoh: 001/SERT/STIKOM/2026">
+        </div>
+        <?php endif; ?>
+        <div class="m3-col-3">
           <label class="m3-field__label" for="file">Berkas</label>
           <input id="file" type="file" name="file" class="m3-input" accept=".pdf,.jpg,.jpeg,.png" required>
           <div class="m3-field__help">PDF, JPG, atau PNG. Maksimal 5 MB.</div>
@@ -145,6 +159,10 @@ include __DIR__ . '/../includes/header.php';
           <td><?= e($s['nama_peserta']) ?></td>
           <td><?= e($s['judul']) ?></td>
           <td class="m3-td-actions">
+            <a href="<?= BASE_URL ?>/cetak_sertifikat.php?peserta_id=<?= (int)$s['mahasiswa_id'] ?>&s_id=<?= (int)$s['id'] ?>" target="_blank"
+               class="m3-icon-btn" title="Cetak desain (html2canvas: kehadiran + nilai)" aria-label="Cetak sertifikat">
+              <span class="m3-icon m3-icon--sm">print</span>
+            </a>
             <a href="<?= UPLOAD_URL . rawurlencode($s['file_path']) ?>" target="_blank"
                class="m3-icon-btn m3-icon-btn--success" title="Unduh" aria-label="Unduh sertifikat">
               <span class="m3-icon m3-icon--sm">download</span>

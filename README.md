@@ -43,7 +43,9 @@ build step, tanpa framework JavaScript.
 mengikuti pasangan token Material 3, dan `prefers-reduced-motion` dihormati.
 
 **JavaScript** — `assets/js/material3.js` (sekitar 2 KB) hanya menangani drawer di layar kecil,
-dialog, dan menutup banner. Tidak ada dependensi.
+dialog, dan menutup banner. Animasi entrance & scroll-reveal ditangani `assets/js/animasi.js`
+yang memakai **GSAP 3 + ScrollTrigger dari CDN** (cdnjs, versi 3.12.5). Bila CDN tidak terjangkau
+(offline), modul animasi diam-diam nonaktif dan halaman tetap berfungsi normal.
 
 ### Ikon dan font
 
@@ -81,6 +83,8 @@ simak-mahasiswa/
 ├── uploads/sertifikat/         # file sertifikat
 ├── assets/css/material3.css    # design system Material 3 (menggantikan Bootstrap)
 ├── assets/js/material3.js      # interaksi drawer, dialog, banner
+├── assets/js/animasi.js        # animasi GSAP (entrance judul/stat, scroll-reveal kartu)
+├── publik/                     # portal publik = landing page (tanpa login)
 ```
 
 ## Instalasi

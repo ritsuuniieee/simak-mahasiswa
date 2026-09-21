@@ -87,8 +87,15 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     <a href="<?= BASE_URL ?>/portal.php" class="m3-btn m3-btn--tonal m3-btn--block">
       <span class="m3-icon">badge</span>Buka portal dengan NIM / NISN
     </a>
+
+    <a href="<?= BASE_URL ?>/publik/" class="m3-btn m3-btn--text m3-btn--block m3-mt-2">
+      <span class="m3-icon">public</span>Kembali ke beranda publik
+    </a>
   </main>
 
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/ScrollTrigger.min.js"></script>
   <script src="<?= BASE_URL ?>/assets/js/material3.js"></script>
+  <script src="<?= BASE_URL ?>/assets/js/animasi.js"></script>
 </body>
 </html>

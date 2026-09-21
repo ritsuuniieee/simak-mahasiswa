@@ -8,21 +8,36 @@ if (isLoggedIn()) {
 }
 
 $error = '';
+$hasPwCol = hasMahasiswaPasswordColumn($pdo);
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     if (!csrfValid()) {
         $error = 'Sesi form kadaluarsa, silakan coba lagi.';
     } else {
         $identitas = trim($_POST['identitas'] ?? '');
+        $password = $_POST['password'] ?? '';
         if ($identitas === '') {
             $error = 'Masukkan NIM (mahasiswa) atau NISN (siswa PKL) Anda.';
         } else {
-            $stmt = $pdo->prepare('SELECT id FROM mahasiswa WHERE nim = ? OR nisn = ? LIMIT 1');
+            $cols = $hasPwCol ? 'id, password' : 'id';
+            $stmt = $pdo->prepare("SELECT $cols FROM mahasiswa WHERE nim = ? OR nisn = ? LIMIT 1");
             $stmt->execute([$identitas, $identitas]);
-            $id = $stmt->fetchColumn();
-            if (!$id) {
+            $row = $stmt->fetch();
+            if (!$row) {
                 $error = 'NIM/NISN tidak ditemukan. Periksa kembali atau hubungi operator.';
+            } elseif ($hasPwCol && !empty($row['password'])) {
+                // Akun sudah punya password -> wajib verifikasi
+                if ($password === '' || !password_verify($password, $row['password'])) {
+                    $error = 'Password salah. Hubungi operator jika lupa password.';
+                } else {
+                    $_SESSION['portal_peserta_id'] = (int)$row['id'];
+                    header('Location: ' . BASE_URL . '/portal_dashboard.php');
+                    exit;
+                }
             } else {
-                $_SESSION['portal_peserta_id'] = (int)$id;
+                // Belum ada password (data lama / kolom belum diisi): izinkan masuk,
+                // peserta diminta membuat password di dashboard.
+                $_SESSION['portal_peserta_id'] = (int)$row['id'];
+                if ($hasPwCol && empty($row['password'])) $_SESSION['portal_perlu_password'] = true;
                 header('Location: ' . BASE_URL . '/portal_dashboard.php');
                 exit;
             }
@@ -79,16 +94,29 @@ $totalSertifikat = $pdo->query("SELECT COUNT(*) FROM sertifikat")->fetchColumn()
 
     <form method="post">
       <?= csrfField() ?>
-      <div class="m3-field m3-mb-3">
+      <div class="m3-field m3-mb-2">
         <label class="m3-field__label" for="identitas">NIM atau NISN</label>
         <input id="identitas" type="text" name="identitas" class="m3-input" required autofocus
                placeholder="Contoh: 2110511001">
-        <div class="m3-field__help">Mahasiswa memakai NIM, siswa PKL memakai NISN. Tidak perlu password.</div>
+        <div class="m3-field__help">Mahasiswa memakai NIM, siswa PKL memakai NISN.</div>
       </div>
+      <?php if ($hasPwCol): ?>
+      <div class="m3-field m3-mb-3">
+        <label class="m3-field__label" for="password">Password</label>
+        <input id="password" type="password" name="password" class="m3-input" autocomplete="current-password"
+               placeholder="Password portal Anda">
+        <div class="m3-field__help">Akun lama yang belum punya password: kosongkan lalu buat password di dalam portal.</div>
+      </div>
+      <?php endif; ?>
       <button type="submit" class="m3-btn m3-btn--filled m3-btn--block">
         <span class="m3-icon">login</span>Buka portal saya
       </button>
     </form>
+
+    <div class="m3-auth__divider">Lihat tanpa masuk?</div>
+    <a href="<?= BASE_URL ?>/publik/" class="m3-btn m3-btn--tonal m3-btn--block">
+      <span class="m3-icon">public</span>Portal publik (rekapan &amp; sertifikat)
+    </a>
 
     <div class="m3-auth__divider">Operator atau dosen?</div>
 
@@ -97,6 +125,9 @@ $totalSertifikat = $pdo->query("SELECT COUNT(*) FROM sertifikat")->fetchColumn()
     </a>
   </main>
 
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/ScrollTrigger.min.js"></script>
   <script src="<?= BASE_URL ?>/assets/js/material3.js"></script>
+  <script src="<?= BASE_URL ?>/assets/js/animasi.js"></script>
 </body>
 </html>

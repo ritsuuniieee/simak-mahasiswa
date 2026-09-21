@@ -58,6 +58,7 @@ CREATE TABLE `dosen` (
   `nidn_nidk` varchar(30) NOT NULL,
   `nama` varchar(100) NOT NULL,
   `no_hp` varchar(20) DEFAULT NULL,
+  `foto` varchar(255) DEFAULT NULL,
   `created_at` timestamp NOT NULL DEFAULT current_timestamp()
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
@@ -100,6 +101,7 @@ CREATE TABLE `kegiatan_harian` (
 CREATE TABLE `mahasiswa` (
   `id` int(11) NOT NULL,
   `user_id` int(11) DEFAULT NULL,
+  `password` varchar(255) DEFAULT NULL,
   `tipe` enum('mahasiswa','siswa_pkl') NOT NULL DEFAULT 'mahasiswa',
   `nim` varchar(30) DEFAULT NULL,
   `nisn` varchar(20) DEFAULT NULL,
@@ -152,6 +154,7 @@ CREATE TABLE `sertifikat` (
   `id` int(11) NOT NULL,
   `mahasiswa_id` int(11) NOT NULL,
   `judul` varchar(150) NOT NULL,
+  `nomor` varchar(60) DEFAULT NULL,
   `file_path` varchar(255) NOT NULL,
   `diupload_oleh` enum('operator','dosen','mahasiswa') NOT NULL DEFAULT 'operator',
   `tanggal_upload` timestamp NOT NULL DEFAULT current_timestamp()
@@ -187,6 +190,22 @@ INSERT INTO `sertifikat` (`id`, `mahasiswa_id`, `judul`, `file_path`, `diupload_
 (24, 7, 'Sertifikat Workshop UI/UX Design', 'sertifikat_dummy_02.pdf', 'operator', '2026-08-14 01:00:00'),
 (25, 14, 'Sertifikat Pelatihan Web Development', 'sertifikat_dummy_10.pdf', 'operator', '2026-08-16 01:00:00'),
 (26, 10, 'Sertifikat Pelatihan Web Development', 'sertifikat_dummy_04.pdf', 'operator', '2026-09-03 01:00:00');
+
+--
+-- Table structure for table `nilai`
+--
+
+CREATE TABLE IF NOT EXISTS `nilai` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `mahasiswa_id` int(11) NOT NULL,
+  `nilai_angka` decimal(5,2) NOT NULL DEFAULT 0,
+  `nilai_huruf` varchar(2) NOT NULL DEFAULT '-',
+  `predikat` varchar(60) NOT NULL DEFAULT '-',
+  `catatan` varchar(255) DEFAULT NULL,
+  `updated_at` timestamp NOT NULL DEFAULT current_timestamp() ON UPDATE current_timestamp(),
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `uniq_nilai_mhs` (`mahasiswa_id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 -- --------------------------------------------------------
 
@@ -346,6 +365,12 @@ ALTER TABLE `mahasiswa`
 --
 ALTER TABLE `sertifikat`
   ADD CONSTRAINT `sertifikat_ibfk_1` FOREIGN KEY (`mahasiswa_id`) REFERENCES `mahasiswa` (`id`) ON DELETE CASCADE;
+
+--
+-- Constraints for table `nilai`
+--
+ALTER TABLE `nilai`
+  ADD CONSTRAINT `nilai_ibfk_1` FOREIGN KEY (`mahasiswa_id`) REFERENCES `mahasiswa` (`id`) ON DELETE CASCADE;
 COMMIT;
 
 /*!40101 SET CHARACTER_SET_CLIENT=@OLD_CHARACTER_SET_CLIENT */;

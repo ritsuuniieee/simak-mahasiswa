@@ -557,13 +557,44 @@ p { margin: 0 0 12px; }
 .m3-input::placeholder,
 .m3-textarea::placeholder { color: color-mix(in srgb, var(--m3-on-surface-variant) 70%, transparent); }
 
+/* Dropdown select — gaya filled M3 Expressive: kontainer tonal, chevron primer */
 .m3-select {
   appearance: none;
-  padding-right: 42px;
-  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='%2352443c'%3E%3Cpath d='M7 10l5 5 5-5z'/%3E%3C/svg%3E");
+  -webkit-appearance: none;
+  padding-right: 46px;
+  cursor: pointer;
+  background-color: var(--m3-surface-container-highest);
+  border-color: var(--m3-outline-variant);
+  border-radius: var(--m3-shape-lg);
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='%238a5024'%3E%3Cpath d='M12 15.5l-7-7 1.4-1.4L12 12.7l5.6-5.6L19 8.5z'/%3E%3C/svg%3E");
   background-repeat: no-repeat;
-  background-position: right 12px center;
-  background-size: 22px;
+  background-position: right 14px center;
+  background-size: 24px;
+  font-weight: 500;
+}
+.m3-select:hover {
+  border-color: var(--m3-on-surface);
+  background-color: color-mix(in srgb, var(--m3-surface-container-highest) 70%, var(--m3-primary-container));
+}
+.m3-select:focus {
+  border-color: var(--m3-primary);
+  background-position: right 14px center;
+  box-shadow: inset 0 0 0 1px var(--m3-primary), 0 0 0 3px color-mix(in srgb, var(--m3-primary) 18%, transparent);
+}
+.m3-select:disabled {
+  cursor: not-allowed;
+  opacity: .55;
+}
+.m3-select option,
+.m3-select optgroup {
+  background-color: var(--m3-surface-container-lowest);
+  color: var(--m3-on-surface);
+  font-weight: 400;
+}
+/* Di dalam dialog (permukaan lebih gelap): bedakan latar dropdown */
+.m3-dialog .m3-select { background-color: var(--m3-surface-container-lowest); }
+.m3-dialog .m3-select:hover {
+  background-color: color-mix(in srgb, var(--m3-surface-container-lowest) 70%, var(--m3-primary-container));
 }
 
 .m3-input[type="file"] { padding: 11px 14px; }
@@ -900,3 +931,68 @@ p { margin: 0 0 12px; }
 .m3-toolbar .m3-input,
 .m3-toolbar .m3-select { min-height: 48px; }
 .m3-toolbar__search { flex: 1; min-width: 220px; }
+
+/* --------------------------------------------------------------------------
+   13. DATA TABLE RESPONSIF — tiap baris jadi kartu di layar kecil (≤640px).
+   Label kolom diambil dari atribut data-label yang disuntik material3.js.
+   -------------------------------------------------------------------------- */
+@media (max-width: 640px) {
+  .m3-table-scroll { overflow-x: visible; }
+
+  .m3-table thead {
+    position: absolute;
+    width: 1px; height: 1px;
+    overflow: hidden;
+    clip: rect(0 0 0 0);
+    white-space: nowrap;
+  }
+
+  .m3-table,
+  .m3-table tbody,
+  .m3-table tr,
+  .m3-table td { display: block; width: 100%; }
+
+  .m3-table tbody tr {
+    background: var(--m3-surface-container-lowest);
+    border: 1px solid var(--m3-outline-variant);
+    border-radius: var(--m3-shape-lg);
+    margin-bottom: 12px;
+    overflow: hidden;
+  }
+  .m3-table tbody tr:hover td { background: transparent; }
+
+  .m3-table tbody td {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    padding: 10px 16px;
+    border-top: 1px solid var(--m3-outline-variant);
+    text-align: right;
+    overflow-wrap: anywhere;
+  }
+  .m3-table tbody tr > td:first-child { border-top: 0; }
+  .m3-table tbody td::before {
+    content: attr(data-label);
+    flex-shrink: 0;
+    max-width: 45%;
+    text-align: left;
+    font-size: .72rem;
+    font-weight: 700;
+    letter-spacing: .03em;
+    text-transform: uppercase;
+    color: var(--m3-on-surface-variant);
+  }
+  /* Sel tanpa label (baris kosong/colspan, kolom aksi): tanpa label kiri */
+  .m3-table tbody td:not([data-label])::before { content: none; }
+  .m3-table tbody td:not([data-label]) { justify-content: center; text-align: center; }
+  .m3-table .m3-td-actions:not([data-label]) { justify-content: flex-start; }
+  .m3-table .m3-td-actions { white-space: normal; border-top: 1px solid var(--m3-outline-variant); }
+  .m3-table__empty { padding: 32px 16px !important; }
+
+  /* Toolbar & form full-width di HP */
+  .m3-toolbar .m3-input,
+  .m3-toolbar .m3-select,
+  .m3-toolbar .m3-btn { flex: 1 1 100%; }
+  .m3-toolbar__search { flex: 1 1 100%; min-width: 0; }
+}

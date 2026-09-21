@@ -25,6 +25,10 @@ define('UPLOAD_URL', BASE_URL . '/uploads/sertifikat/');
 define('FOTO_DIR', __DIR__ . '/../uploads/foto/');
 define('FOTO_URL', BASE_URL . '/uploads/foto/');
 
+// Folder tempat menyimpan foto profil dosen
+define('DOSEN_FOTO_DIR', __DIR__ . '/../uploads/foto_dosen/');
+define('DOSEN_FOTO_URL', BASE_URL . '/uploads/foto_dosen/');
+
 // ------------------------------------------------------------
 // Patokan jam kehadiran (dipakai untuk menandai "Tepat Waktu" / "Terlambat")
 // Format 24 jam HH:MM:SS

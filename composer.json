@@ -1,0 +1,12 @@
+{
+  "name": "simak/simak-mahasiswa-pkl",
+  "description": "SIMAK Mahasiswa & PKL — UI berbasis Material 3 Expressive.",
+  "private": true,
+  "require": {
+    "php": ">=8.1",
+    "phpoffice/phpspreadsheet": "^2.0"
+  },
+  "config": {
+    "optimize-autoloader": true
+  }
+}

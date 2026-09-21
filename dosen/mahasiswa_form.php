@@ -30,7 +30,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     if (!csrfValid()) {
         $errors[] = 'Sesi form kadaluarsa, coba lagi.';
     } else {
-        $data['tipe'] = in_array($_POST['tipe'] ?? '', ['mahasiswa','siswa_pkl'], true) ? $_POST['tipe'] : 'mahasiswa';
+        $data['tipe'] = $isEdit ? $row['tipe'] : (in_array($_POST['tipe'] ?? '', ['mahasiswa','siswa_pkl'], true) ? $_POST['tipe'] : 'mahasiswa');
         $data['nim'] = trim($_POST['nim'] ?? '');
         $data['nisn'] = trim($_POST['nisn'] ?? '');
         $data['nama'] = trim($_POST['nama'] ?? '');
@@ -41,8 +41,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $data['alamat'] = trim($_POST['alamat'] ?? '');
         $data['status'] = $_POST['status'] ?? 'aktif';
 
-        if ($data['nama'] === '' || $data['prodi'] === '') $errors[] = 'Nama dan prodi/bidang wajib diisi.';
-        if ($data['tipe'] === 'mahasiswa' && $data['nim'] === '') $errors[] = 'NIM wajib diisi untuk tipe Mahasiswa.';
+        if ($data['nama'] === '') $errors[] = 'Nama lengkap wajib diisi.';
+        if ($data['tipe'] === 'mahasiswa') {
+            if ($data['nim'] === '') $errors[] = 'NIM wajib diisi untuk tipe Mahasiswa.';
+            if ($data['prodi'] === '') $errors[] = 'Program studi wajib diisi untuk tipe Mahasiswa.';
+        }
         if ($data['tipe'] === 'siswa_pkl') {
             if ($data['nisn'] === '') $errors[] = 'NISN wajib diisi untuk tipe Siswa PKL.';
             if ($data['asal_sekolah'] === '') $errors[] = 'Asal sekolah wajib diisi untuk tipe Siswa PKL.';
@@ -85,15 +88,17 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             $fotoFinal = $fotoBaru ?? ($data['foto'] ?: null);
             $nimFinal = $data['tipe'] === 'mahasiswa' ? $data['nim'] : null;
             $nisnFinal = $data['tipe'] === 'siswa_pkl' ? $data['nisn'] : null;
+            $prodiFinal = $data['tipe'] === 'mahasiswa' ? ($data['prodi'] ?: null) : null;
+            $jurusanFinal = $data['tipe'] === 'siswa_pkl' ? ($data['jurusan'] ?: null) : null;
             $asalFinal = $data['tipe'] === 'siswa_pkl' ? $data['asal_sekolah'] : null;
 
             if ($isEdit) {
-                $stmt = $pdo->prepare('UPDATE mahasiswa SET tipe=?, nim=?, nisn=?, nama=?, prodi=?, asal_sekolah=?, no_hp=?, alamat=?, status=?, foto=? WHERE id=? AND dosen_id=?');
-                $stmt->execute([$data['tipe'], $nimFinal, $nisnFinal, $data['nama'], $data['prodi'], $asalFinal, $data['no_hp'], $data['alamat'], $data['status'], $fotoFinal, $id, $dosenId]);
+                $stmt = $pdo->prepare('UPDATE mahasiswa SET tipe=?, nim=?, nisn=?, nama=?, prodi=?, jurusan=?, asal_sekolah=?, no_hp=?, alamat=?, status=?, foto=? WHERE id=? AND dosen_id=?');
+                $stmt->execute([$data['tipe'], $nimFinal, $nisnFinal, $data['nama'], $prodiFinal, $jurusanFinal, $asalFinal, $data['no_hp'], $data['alamat'], $data['status'], $fotoFinal, $id, $dosenId]);
                 setFlash('success', 'Data berhasil diperbarui.');
             } else {
-                $stmt = $pdo->prepare('INSERT INTO mahasiswa (tipe, nim, nisn, nama, prodi, asal_sekolah, dosen_id, no_hp, alamat, status, foto) VALUES (?,?,?,?,?,?,?,?,?,?,?)');
-                $stmt->execute([$data['tipe'], $nimFinal, $nisnFinal, $data['nama'], $data['prodi'], $asalFinal, $dosenId, $data['no_hp'], $data['alamat'], $data['status'], $fotoFinal]);
+                $stmt = $pdo->prepare('INSERT INTO mahasiswa (tipe, nim, nisn, nama, prodi, jurusan, asal_sekolah, dosen_id, no_hp, alamat, status, foto) VALUES (?,?,?,?,?,?,?,?,?,?,?,?)');
+                $stmt->execute([$data['tipe'], $nimFinal, $nisnFinal, $data['nama'], $prodiFinal, $jurusanFinal, $asalFinal, $dosenId, $data['no_hp'], $data['alamat'], $data['status'], $fotoFinal]);
                 setFlash('success', 'Peserta baru berhasil ditambahkan sebagai bimbingan Anda. Untuk membuatkan akun login, hubungi operator.');
             }
             header('Location: ' . BASE_URL . '/dosen/mahasiswa.php');
@@ -117,13 +122,13 @@ include __DIR__ . '/../includes/header.php';
     <form method="post" enctype="multipart/form-data" novalidate>
       <?= csrfField() ?>
 
-      <label class="m3-field__label">Tipe peserta</label>
+      <label class="m3-field__label">Tipe peserta<?= $isEdit ? ' (dikunci)' : '' ?></label>
       <div class="m3-segmented m3-mb-3">
         <input type="radio" name="tipe" id="tipeMhs" value="mahasiswa"
-               <?= $data['tipe'] === 'mahasiswa' ? 'checked' : '' ?> onchange="toggleTipe()">
+               <?= $data['tipe'] === 'mahasiswa' ? 'checked' : '' ?> onchange="toggleTipe()" <?= $isEdit ? 'disabled' : '' ?>>
         <label for="tipeMhs"><span class="m3-icon m3-icon--sm">school</span>Mahasiswa</label>
         <input type="radio" name="tipe" id="tipePkl" value="siswa_pkl"
-               <?= $data['tipe'] === 'siswa_pkl' ? 'checked' : '' ?> onchange="toggleTipe()">
+               <?= $data['tipe'] === 'siswa_pkl' ? 'checked' : '' ?> onchange="toggleTipe()" <?= $isEdit ? 'disabled' : '' ?>>
         <label for="tipePkl"><span class="m3-icon m3-icon--sm">engineering</span>Siswa PKL</label>
       </div>
 

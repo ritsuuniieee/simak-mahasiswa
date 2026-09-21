@@ -3,60 +3,88 @@ require_once __DIR__ . '/../includes/auth.php';
 require_once __DIR__ . '/../includes/functions.php';
 requireRole(['operator']);
 
-$pageTitle = 'Tambah Peserta';
+$id = isset($_GET['id']) ? (int)$_GET['id'] : 0;
+if (!$id) {
+    // File ini khusus EDIT. Tambah data lewat mahasiswa_form.php
+    header('Location: ' . BASE_URL . '/operator/mahasiswa_form.php');
+    exit;
+}
+$pageTitle = 'Edit Data Peserta';
+
+$stmt = $pdo->prepare('SELECT * FROM mahasiswa WHERE id = ?');
+$stmt->execute([$id]);
+$row = $stmt->fetch();
+if (!$row) {
+    setFlash('error', 'Data tidak ditemukan.');
+    header('Location: ' . BASE_URL . '/operator/mahasiswa.php');
+    exit;
+}
+
+// Tipe DIKUNCI: tidak boleh diubah saat edit (sesuai revisi)
+$tipe = $row['tipe'];
+$isMhs = $tipe === 'mahasiswa';
 
 $data = [
-    'tipe' => 'mahasiswa', 'nim' => '', 'nisn' => '', 'nama' => '', 'prodi' => 'Sistem Informasi',
-    'asal_sekolah' => '', 'jurusan' => '', 'dosen_id' => '', 'no_hp' => '', 'alamat' => '',
-    'status' => 'aktif', 'foto' => '',
+    'nim' => $row['nim'] ?? '', 'nisn' => $row['nisn'] ?? '', 'nama' => $row['nama'] ?? '',
+    'prodi' => $row['prodi'] ?? '', 'jurusan' => $row['jurusan'] ?? '',
+    'asal_sekolah' => $row['asal_sekolah'] ?? '', 'dosen_id' => $row['dosen_id'] ?? '',
+    'no_hp' => $row['no_hp'] ?? '', 'alamat' => $row['alamat'] ?? '',
+    'status' => $row['status'] ?? 'aktif', 'foto' => $row['foto'] ?? '',
 ];
 $errors = [];
 $hasPwCol = hasMahasiswaPasswordColumn($pdo);
 
 $dosenList = $pdo->query('SELECT id, nama FROM dosen ORDER BY nama')->fetchAll();
 $allowedExtFoto = ['jpg', 'jpeg', 'png'];
-$maxSizeFoto = 2 * 1024 * 1024; // 2 MB
+$maxSizeFoto = 2 * 1024 * 1024;
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     if (!csrfValid()) {
         $errors[] = 'Sesi form kadaluarsa, silakan coba lagi.';
     } else {
-        $data['tipe'] = in_array($_POST['tipe'] ?? '', ['mahasiswa','siswa_pkl'], true) ? $_POST['tipe'] : 'mahasiswa';
-        $data['nim'] = trim($_POST['nim'] ?? '');
-        $data['nisn'] = trim($_POST['nisn'] ?? '');
+        // Tipe TIDAK diambil dari POST — tetap pakai $tipe dari database
         $data['nama'] = trim($_POST['nama'] ?? '');
-        $data['prodi'] = $_POST['prodi'] ?? '';
-        $data['jurusan'] = trim($_POST['jurusan'] ?? '');
-        $data['asal_sekolah'] = trim($_POST['asal_sekolah'] ?? '');
         $data['dosen_id'] = ($_POST['dosen_id'] ?? '') !== '' ? (int)$_POST['dosen_id'] : null;
         $data['no_hp'] = trim($_POST['no_hp'] ?? '');
         $data['alamat'] = trim($_POST['alamat'] ?? '');
         $data['status'] = $_POST['status'] ?? 'aktif';
-        $passwordAwal = trim($_POST['password_awal'] ?? '');
+        $passwordBaru = trim($_POST['password_baru'] ?? '');
 
-        $isMhs = $data['tipe'] === 'mahasiswa';
-        if ($data['nama'] === '') $errors[] = 'Nama lengkap wajib diisi.';
         if ($isMhs) {
+            $data['nim'] = trim($_POST['nim'] ?? '');
+            $data['prodi'] = $_POST['prodi'] ?? '';
+            // Pastikan field tipe lain dikosongkan
+            $data['nisn'] = ''; $data['jurusan'] = ''; $data['asal_sekolah'] = '';
+            if ($data['nama'] === '' || $data['prodi'] === '') $errors[] = 'Nama dan program studi wajib diisi.';
             if ($data['nim'] === '') $errors[] = 'NIM wajib diisi untuk tipe Mahasiswa.';
-            if ($data['prodi'] === '') $errors[] = 'Program studi wajib diisi untuk tipe Mahasiswa.';
         } else {
+            $data['nisn'] = trim($_POST['nisn'] ?? '');
+            $data['jurusan'] = trim($_POST['jurusan'] ?? '');
+            $data['asal_sekolah'] = trim($_POST['asal_sekolah'] ?? '');
+            $data['nim'] = ''; $data['prodi'] = null;
+            if ($data['nama'] === '') $errors[] = 'Nama wajib diisi.';
             if ($data['nisn'] === '') $errors[] = 'NISN wajib diisi untuk tipe Siswa PKL.';
             if ($data['asal_sekolah'] === '') $errors[] = 'Asal sekolah wajib diisi untuk tipe Siswa PKL.';
         }
-        if ($hasPwCol && $passwordAwal !== '' && strlen($passwordAwal) < 6) {
-            $errors[] = 'Password awal minimal 6 karakter (kosongkan bila belum ditentukan).';
+
+        if (!in_array($data['status'], ['aktif','cuti','lulus','selesai','nonaktif'], true)) {
+            $data['status'] = 'aktif';
+        }
+        if ($hasPwCol && $passwordBaru !== '' && strlen($passwordBaru) < 6) {
+            $errors[] = 'Password baru minimal 6 karakter (kosongkan jika tidak diubah).';
         }
 
         if (!$errors && $data['nim'] !== '') {
-            $stmt = $pdo->prepare('SELECT id FROM mahasiswa WHERE nim = ?');
-            $stmt->execute([$data['nim']]);
+            $stmt = $pdo->prepare('SELECT id FROM mahasiswa WHERE nim = ? AND id != ?');
+            $stmt->execute([$data['nim'], $id]);
             if ($stmt->fetch()) $errors[] = 'NIM sudah digunakan.';
         }
         if (!$errors && $data['nisn'] !== '') {
-            $stmt = $pdo->prepare('SELECT id FROM mahasiswa WHERE nisn = ?');
-            $stmt->execute([$data['nisn']]);
+            $stmt = $pdo->prepare('SELECT id FROM mahasiswa WHERE nisn = ? AND id != ?');
+            $stmt->execute([$data['nisn'], $id]);
             if ($stmt->fetch()) $errors[] = 'NISN sudah digunakan.';
         }
+
         $fotoBaru = null;
         if (!empty($_FILES['foto']) && $_FILES['foto']['error'] !== UPLOAD_ERR_NO_FILE) {
             if ($_FILES['foto']['error'] !== UPLOAD_ERR_OK) {
@@ -81,24 +109,26 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                     if (!move_uploaded_file($_FILES['foto']['tmp_name'], FOTO_DIR . $fotoBaru)) {
                         throw new Exception('Gagal menyimpan foto ke server.');
                     }
+                    if (!empty($data['foto']) && is_file(FOTO_DIR . $data['foto'])) @unlink(FOTO_DIR . $data['foto']);
                 }
+                $fotoFinal = $fotoBaru ?? ($data['foto'] ?: null);
                 $nimFinal = $isMhs ? $data['nim'] : null;
                 $nisnFinal = !$isMhs ? $data['nisn'] : null;
                 $prodiFinal = $isMhs ? $data['prodi'] : null;
                 $jurusanFinal = !$isMhs ? ($data['jurusan'] ?: null) : null;
                 $asalFinal = !$isMhs ? $data['asal_sekolah'] : null;
 
-                if ($hasPwCol) {
-                    $hash = $passwordAwal !== '' ? password_hash($passwordAwal, PASSWORD_DEFAULT) : null;
-                    $stmt = $pdo->prepare('INSERT INTO mahasiswa (user_id, password, tipe, nim, nisn, nama, prodi, jurusan, asal_sekolah, dosen_id, no_hp, alamat, status, foto) VALUES (NULL,?,?,?,?,?,?,?,?,?,?,?, ?,?)');
-                    $stmt->execute([$hash, $data['tipe'], $nimFinal, $nisnFinal, $data['nama'], $prodiFinal, $jurusanFinal, $asalFinal, $data['dosen_id'], $data['no_hp'], $data['alamat'], $data['status'], $fotoBaru]);
-                } else {
-                    $stmt = $pdo->prepare('INSERT INTO mahasiswa (user_id, tipe, nim, nisn, nama, prodi, jurusan, asal_sekolah, dosen_id, no_hp, alamat, status, foto) VALUES (NULL,?,?,?,?,?,?,?,?,?,?,?,?)');
-                    $stmt->execute([$data['tipe'], $nimFinal, $nisnFinal, $data['nama'], $prodiFinal, $jurusanFinal, $asalFinal, $data['dosen_id'], $data['no_hp'], $data['alamat'], $data['status'], $fotoBaru]);
+                $sql = 'UPDATE mahasiswa SET nim=?, nisn=?, nama=?, prodi=?, jurusan=?, asal_sekolah=?, dosen_id=?, no_hp=?, alamat=?, status=?, foto=? WHERE id=?';
+                $stmt = $pdo->prepare($sql);
+                $stmt->execute([$nimFinal, $nisnFinal, $data['nama'], $prodiFinal, $jurusanFinal, $asalFinal, $data['dosen_id'], $data['no_hp'], $data['alamat'], $data['status'], $fotoFinal, $id]);
+
+                if ($hasPwCol && $passwordBaru !== '') {
+                    $stmt = $pdo->prepare('UPDATE mahasiswa SET password=? WHERE id=?');
+                    $stmt->execute([password_hash($passwordBaru, PASSWORD_DEFAULT), $id]);
                 }
 
                 $pdo->commit();
-                setFlash('success', 'Peserta baru berhasil ditambahkan. Peserta dapat masuk Portal dengan NIM/NISN' . ($hasPwCol && $passwordAwal !== '' ? ' + password yang ditentukan.' : ' mereka.'));
+                setFlash('success', 'Data berhasil diperbarui. Tipe peserta dikunci (' . labelTipe($tipe) . ') dan tidak dapat diubah.');
                 header('Location: ' . BASE_URL . '/operator/mahasiswa.php');
                 exit;
             } catch (Exception $e) {
@@ -111,7 +141,12 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
 include __DIR__ . '/../includes/header.php';
 ?>
-<h1 class="m3-page-title">Tambah peserta</h1>
+<h1 class="m3-page-title">Edit data peserta</h1>
+
+<div class="m3-banner m3-banner--info m3-mb-3">
+  <span class="m3-icon">lock</span>
+  <span class="m3-grow">Tipe peserta dikunci sebagai <strong><?= e(labelTipe($tipe)) ?></strong> dan tidak dapat diubah. Hanya input yang relevan dengan tipe ini yang ditampilkan.</span>
+</div>
 
 <?php foreach ($errors as $err): ?>
   <div class="m3-banner m3-banner--error">
@@ -124,53 +159,50 @@ include __DIR__ . '/../includes/header.php';
     <form method="post" enctype="multipart/form-data" novalidate>
       <?= csrfField() ?>
 
-      <label class="m3-field__label">Tipe peserta</label>
-      <div class="m3-segmented m3-mb-3">
-        <input type="radio" name="tipe" id="tipeMhs" value="mahasiswa"
-               <?= $data['tipe'] === 'mahasiswa' ? 'checked' : '' ?> onchange="toggleTipe()">
-        <label for="tipeMhs"><span class="m3-icon m3-icon--sm">school</span>Mahasiswa</label>
-        <input type="radio" name="tipe" id="tipePkl" value="siswa_pkl"
-               <?= $data['tipe'] === 'siswa_pkl' ? 'checked' : '' ?> onchange="toggleTipe()">
-        <label for="tipePkl"><span class="m3-icon m3-icon--sm">engineering</span>Siswa PKL</label>
-      </div>
-
       <div class="m3-grid">
         <div class="m3-col-4">
           <label class="m3-field__label">Foto peserta</label>
-          <img id="fotoPreview" alt="Pratinjau foto" class="m3-avatar m3-avatar--xl m3-mb-2" src="" style="display:none">
+          <img id="fotoPreview" alt="Pratinjau foto" class="m3-avatar m3-avatar--xl m3-mb-2"
+               src="<?= $data['foto'] ? FOTO_URL . rawurlencode($data['foto']) : '' ?>"
+               style="<?= $data['foto'] ? '' : 'display:none' ?>">
           <input type="file" name="foto" class="m3-input" accept=".jpg,.jpeg,.png" onchange="previewFoto(this)">
           <div class="m3-field__help">JPG atau PNG, maksimal 2 MB.</div>
+          <div class="m3-field__help m3-mt-2">Tipe: <?= badgeTipe($tipe) ?></div>
         </div>
 
         <div class="m3-col-8">
           <div class="m3-grid">
-            <div class="m3-col-6" id="wrapNim">
-              <label class="m3-field__label" for="nim">NIM</label>
-              <input id="nim" type="text" name="nim" class="m3-input" value="<?= e($data['nim']) ?>">
-            </div>
-            <div class="m3-col-6" id="wrapNisn" style="display:none">
-              <label class="m3-field__label" for="nisn">NISN</label>
-              <input id="nisn" type="text" name="nisn" class="m3-input" value="<?= e($data['nisn']) ?>">
-            </div>
+            <?php if ($isMhs): ?>
+              <div class="m3-col-6">
+                <label class="m3-field__label" for="nim">NIM</label>
+                <input id="nim" type="text" name="nim" class="m3-input" required value="<?= e($data['nim']) ?>">
+              </div>
+              <div class="m3-col-6">
+                <label class="m3-field__label" for="prodi">Program studi</label>
+                <select id="prodi" name="prodi" class="m3-select">
+                  <?php foreach (['Sistem Informasi','Teknik Informatika'] as $st): ?>
+                    <option value="<?= $st ?>" <?= $data['prodi'] === $st ? 'selected' : '' ?>><?= $st ?></option>
+                  <?php endforeach; ?>
+                </select>
+              </div>
+            <?php else: ?>
+              <div class="m3-col-6">
+                <label class="m3-field__label" for="nisn">NISN</label>
+                <input id="nisn" type="text" name="nisn" class="m3-input" required value="<?= e($data['nisn']) ?>">
+              </div>
+              <div class="m3-col-6">
+                <label class="m3-field__label" for="jurusan">Jurusan / Bidang</label>
+                <input id="jurusan" type="text" name="jurusan" class="m3-input" value="<?= e($data['jurusan']) ?>"
+                       placeholder="Contoh: TKJ, RPL, Multimedia">
+              </div>
+              <div class="m3-col-12">
+                <label class="m3-field__label" for="asal_sekolah">Asal sekolah</label>
+                <input id="asal_sekolah" type="text" name="asal_sekolah" class="m3-input" required value="<?= e($data['asal_sekolah']) ?>">
+              </div>
+            <?php endif; ?>
             <div class="m3-col-12">
               <label class="m3-field__label" for="nama">Nama lengkap</label>
               <input id="nama" type="text" name="nama" class="m3-input" required value="<?= e($data['nama']) ?>">
-            </div>
-            <div class="m3-col-6" id="wrapProdi">
-              <label class="m3-field__label" for="prodi">Program studi</label>
-              <select id="prodi" name="prodi" class="m3-select">
-                <?php foreach (['Sistem Informasi','Teknik Informatika'] as $st): ?>
-                  <option value="<?= $st ?>" <?= $data['prodi'] === $st ? 'selected' : '' ?>><?= $st ?></option>
-                <?php endforeach; ?>
-              </select>
-            </div>
-            <div class="m3-col-6" id="wrapJurusan" style="display:none">
-              <label class="m3-field__label" for="jurusan">Jurusan / Bidang</label>
-              <input id="jurusan" type="text" name="jurusan" class="m3-input" value="<?= e($data['jurusan']) ?>" placeholder="Contoh: TKJ, RPL">
-            </div>
-            <div class="m3-col-6" id="wrapAsalSekolah" style="display:none">
-              <label class="m3-field__label" for="asal_sekolah">Asal sekolah</label>
-              <input id="asal_sekolah" type="text" name="asal_sekolah" class="m3-input" value="<?= e($data['asal_sekolah']) ?>">
             </div>
             <div class="m3-col-6">
               <label class="m3-field__label" for="status">Status</label>
@@ -182,9 +214,9 @@ include __DIR__ . '/../includes/header.php';
             </div>
             <?php if ($hasPwCol): ?>
             <div class="m3-col-6">
-              <label class="m3-field__label" for="password_awal">Password portal awal</label>
-              <input id="password_awal" type="password" name="password_awal" class="m3-input" autocomplete="new-password" minlength="6">
-              <div class="m3-field__help">Opsional. Minimal 6 karakter. Dipakai masuk Portal.</div>
+              <label class="m3-field__label" for="password_baru">Password portal baru</label>
+              <input id="password_baru" type="password" name="password_baru" class="m3-input" autocomplete="new-password" minlength="6">
+              <div class="m3-field__help">Kosongkan jika tidak diubah. Minimal 6 karakter.</div>
             </div>
             <?php endif; ?>
           </div>
@@ -222,14 +254,6 @@ include __DIR__ . '/../includes/header.php';
 </section>
 
 <script>
-function toggleTipe() {
-  var isPkl = document.getElementById('tipePkl').checked;
-  document.getElementById('wrapNim').style.display = isPkl ? 'none' : 'block';
-  document.getElementById('wrapNisn').style.display = isPkl ? 'block' : 'none';
-  document.getElementById('wrapAsalSekolah').style.display = isPkl ? 'block' : 'none';
-  document.getElementById('wrapProdi').style.display = isPkl ? 'none' : 'block';
-  document.getElementById('wrapJurusan').style.display = isPkl ? 'block' : 'none';
-}
 function previewFoto(input) {
   var preview = document.getElementById('fotoPreview');
   if (input.files && input.files[0]) {
@@ -237,7 +261,6 @@ function previewFoto(input) {
     preview.style.display = 'block';
   }
 }
-toggleTipe();
 </script>
 
 <?php include __DIR__ . '/../includes/footer.php'; ?>

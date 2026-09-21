@@ -6,12 +6,15 @@ requireRole(['operator']);
 $pageTitle = 'Rekap Absensi';
 
 $tanggal = $_GET['tanggal'] ?? '';
+$bulan = $_GET['bulan'] ?? '';
+if (!validBulan($bulan)) $bulan = '';
 $search = trim($_GET['q'] ?? '');
 $tipeFilter = $_GET['tipe'] ?? '';
 
 $sql = "SELECT a.*, m.nama AS nama_peserta, m.nim, m.nisn, m.tipe, m.prodi
         FROM absensi a JOIN mahasiswa m ON m.id = a.mahasiswa_id WHERE 1=1";
 $params = [];
+if ($bulan !== '') { $sql .= " AND DATE_FORMAT(a.tanggal,'%Y-%m') = ?"; $params[] = $bulan; }
 if ($tanggal !== '') { $sql .= " AND a.tanggal = ?"; $params[] = $tanggal; }
 if ($search !== '') { $sql .= " AND (m.nama LIKE ? OR m.nim LIKE ? OR m.nisn LIKE ?)"; $like="%$search%"; array_push($params,$like,$like,$like); }
 if (in_array($tipeFilter, ['mahasiswa','siswa_pkl'], true)) { $sql .= " AND m.tipe = ?"; $params[] = $tipeFilter; }
@@ -20,7 +23,7 @@ $stmt = $pdo->prepare($sql);
 $stmt->execute($params);
 $absensiList = $stmt->fetchAll();
 
-// Ringkasan rekap (mengikuti filter tanggal & tipe yang sama, tanpa limit)
+// Ringkasan rekap (mengikuti filter tanggal/bulan & tipe yang sama, tanpa limit)
 $sqlRekap = "SELECT
     COUNT(*) AS total,
     SUM(status_masuk='tepat_waktu') AS tepat_waktu,
@@ -28,11 +31,27 @@ $sqlRekap = "SELECT
     SUM(status_keluar='pulang_cepat') AS pulang_cepat
     FROM absensi a JOIN mahasiswa m ON m.id = a.mahasiswa_id WHERE 1=1";
 $paramsRekap = [];
+if ($bulan !== '') { $sqlRekap .= " AND DATE_FORMAT(a.tanggal,'%Y-%m') = ?"; $paramsRekap[] = $bulan; }
 if ($tanggal !== '') { $sqlRekap .= " AND a.tanggal = ?"; $paramsRekap[] = $tanggal; }
 if (in_array($tipeFilter, ['mahasiswa','siswa_pkl'], true)) { $sqlRekap .= " AND m.tipe = ?"; $paramsRekap[] = $tipeFilter; }
 $stmt = $pdo->prepare($sqlRekap);
 $stmt->execute($paramsRekap);
 $rekap = $stmt->fetch();
+
+// Pengelompokan per bulan (mengikuti filter tipe + pencarian, abaikan tanggal/bulan spesifik)
+$sqlBulan = "SELECT DATE_FORMAT(a.tanggal,'%Y-%m') AS bulan,
+    COUNT(*) AS total,
+    SUM(a.status_masuk='tepat_waktu') AS tepat_waktu,
+    SUM(a.status_masuk='terlambat') AS terlambat,
+    SUM(a.status_keluar='pulang_cepat') AS pulang_cepat
+    FROM absensi a JOIN mahasiswa m ON m.id = a.mahasiswa_id WHERE 1=1";
+$paramsBulan = [];
+if ($search !== '') { $sqlBulan .= " AND (m.nama LIKE ? OR m.nim LIKE ? OR m.nisn LIKE ?)"; $like="%$search%"; array_push($paramsBulan,$like,$like,$like); }
+if (in_array($tipeFilter, ['mahasiswa','siswa_pkl'], true)) { $sqlBulan .= " AND m.tipe = ?"; $paramsBulan[] = $tipeFilter; }
+$sqlBulan .= " GROUP BY DATE_FORMAT(a.tanggal,'%Y-%m') ORDER BY bulan DESC LIMIT 24";
+$stmt = $pdo->prepare($sqlBulan);
+$stmt->execute($paramsBulan);
+$rekapBulanan = $stmt->fetchAll();
 
 include __DIR__ . '/../includes/header.php';
 ?>
@@ -62,7 +81,8 @@ include __DIR__ . '/../includes/header.php';
 </div>
 
 <form class="m3-toolbar">
-  <input type="date" name="tanggal" class="m3-input" style="width:auto" value="<?= e($tanggal) ?>">
+  <input type="month" name="bulan" class="m3-input" style="width:auto" value="<?= e($bulan) ?>" title="Filter bulan">
+  <input type="date" name="tanggal" class="m3-input" style="width:auto" value="<?= e($tanggal) ?>" title="Filter tanggal spesifik">
   <select name="tipe" class="m3-select" style="width:auto">
     <option value="">Semua tipe</option>
     <option value="mahasiswa" <?= $tipeFilter === 'mahasiswa' ? 'selected' : '' ?>>Mahasiswa</option>
@@ -74,6 +94,36 @@ include __DIR__ . '/../includes/header.php';
   <button class="m3-btn m3-btn--tonal"><span class="m3-icon m3-icon--sm">filter_alt</span>Terapkan</button>
   <a href="absensi_rekap.php" class="m3-btn m3-btn--text">Atur ulang</a>
 </form>
+<?php if ($bulan): ?>
+  <div class="m3-banner m3-banner--info m3-mb-3">
+    <span class="m3-icon">calendar_month</span>
+    <span class="m3-grow">Menampilkan bulan <strong><?= e(formatBulanId($bulan)) ?></strong>.</span>
+  </div>
+<?php endif; ?>
+
+<section class="m3-card m3-card--filled m3-mb-3">
+  <div class="m3-card__header">Pengelompokan per bulan<?= $tipeFilter ? ' &middot; ' . e(labelTipe($tipeFilter)) : '' ?></div>
+  <div class="m3-table-scroll">
+    <table class="m3-table">
+      <thead><tr><th>Bulan</th><th>Total</th><th>Tepat waktu</th><th>Terlambat</th><th>Pulang cepat</th><th></th></tr></thead>
+      <tbody>
+      <?php if (!$rekapBulanan): ?>
+        <tr><td colspan="6" class="m3-table__empty">Belum ada data per bulan.</td></tr>
+      <?php endif; ?>
+      <?php foreach ($rekapBulanan as $rb): ?>
+        <tr>
+          <td><?= e(formatBulanId($rb['bulan'])) ?></td>
+          <td><?= (int)$rb['total'] ?></td>
+          <td><?= (int)$rb['tepat_waktu'] ?></td>
+          <td><?= (int)$rb['terlambat'] ?></td>
+          <td><?= (int)$rb['pulang_cepat'] ?></td>
+          <td><a class="m3-btn m3-btn--text m3-btn--sm" href="?bulan=<?= e($rb['bulan']) ?>&tipe=<?= e($tipeFilter) ?>&q=<?= urlencode($search) ?>">Lihat</a></td>
+        </tr>
+      <?php endforeach; ?>
+      </tbody>
+    </table>
+  </div>
+</section>
 
 <section class="m3-table-wrap">
   <div class="m3-table-scroll">
