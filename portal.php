@@ -104,18 +104,17 @@ $totalSertifikat = $pdo->query("SELECT COUNT(*) FROM sertifikat")->fetchColumn()
       <div class="m3-field m3-mb-3">
         <label class="m3-field__label" for="password">Password</label>
         <input id="password" type="password" name="password" class="m3-input" autocomplete="current-password"
-               placeholder="Password portal Anda">
-        <div class="m3-field__help">Akun lama yang belum punya password: kosongkan lalu buat password di dalam portal.</div>
+               placeholder="Password Anda">
       </div>
       <?php endif; ?>
       <button type="submit" class="m3-btn m3-btn--filled m3-btn--block">
-        <span class="m3-icon">login</span>Buka portal saya
+        <span class="m3-icon">login</span>Masuk
       </button>
     </form>
 
     <div class="m3-auth__divider">Lihat tanpa masuk?</div>
     <a href="<?= BASE_URL ?>/publik/" class="m3-btn m3-btn--tonal m3-btn--block">
-      <span class="m3-icon">public</span>Portal publik (rekapan &amp; sertifikat)
+      <span class="m3-icon">public</span>Beranda publik
     </a>
 
     <div class="m3-auth__divider">Operator atau dosen?</div>

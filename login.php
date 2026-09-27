@@ -85,7 +85,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     <div class="m3-auth__divider">Mahasiswa atau siswa PKL?</div>
 
     <a href="<?= BASE_URL ?>/portal.php" class="m3-btn m3-btn--tonal m3-btn--block">
-      <span class="m3-icon">badge</span>Buka portal dengan NIM / NISN
+      <span class="m3-icon">badge</span>Masuk dengan NIM / NISN
     </a>
 
     <a href="<?= BASE_URL ?>/publik/" class="m3-btn m3-btn--text m3-btn--block m3-mt-2">

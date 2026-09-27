@@ -204,10 +204,10 @@ include __DIR__ . '/../includes/header.php';
               <label class="m3-field__label" for="nama">Nama lengkap</label>
               <input id="nama" type="text" name="nama" class="m3-input" required value="<?= e($data['nama']) ?>">
             </div>
-            <div class="m3-col-6">
+            <div class="m3-col-6" id="WrapStatus" style="display:block">
               <label class="m3-field__label" for="status">Status</label>
               <select id="status" name="status" class="m3-select">
-                <?php foreach (['aktif','cuti','lulus','selesai','nonaktif'] as $st): ?>
+                <?php foreach (['aktif','selesai'] as $st): ?>
                   <option value="<?= $st ?>" <?= $data['status'] === $st ? 'selected' : '' ?>><?= ucfirst($st) ?></option>
                 <?php endforeach; ?>
               </select>
