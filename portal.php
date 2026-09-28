@@ -66,11 +66,10 @@ $totalSertifikat = $pdo->query("SELECT COUNT(*) FROM sertifikat")->fetchColumn()
   <main class="m3-auth__card m3-auth__card--wide">
     <div class="m3-auth__head">
       <img src="<?= BASE_URL ?>/assets/images/logo-stikom.png" alt="" class="m3-auth__logo">
-      <h1 class="m3-auth__title">Portal peserta</h1>
-      <p class="m3-auth__subtitle">Isi absensi, catat kegiatan harian, dan unduh sertifikat</p>
+      <h1 class="m3-auth__title">Masuk</h1>
     </div>
 
-    <div class="m3-metrics">
+    <!-- <div class="m3-metrics">
       <div class="m3-metric">
         <div class="m3-metric__value"><?= (int)$totalMhs ?></div>
         <div class="m3-metric__label">Mahasiswa</div>
@@ -83,7 +82,7 @@ $totalSertifikat = $pdo->query("SELECT COUNT(*) FROM sertifikat")->fetchColumn()
         <div class="m3-metric__value"><?= (int)$totalSertifikat ?></div>
         <div class="m3-metric__label">Sertifikat</div>
       </div>
-    </div>
+    </div> -->
 
     <?php if ($error): ?>
       <div class="m3-banner m3-banner--error">

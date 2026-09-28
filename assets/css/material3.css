@@ -996,3 +996,35 @@ p { margin: 0 0 12px; }
   .m3-toolbar .m3-btn { flex: 1 1 100%; }
   .m3-toolbar__search { flex: 1 1 100%; min-width: 0; }
 }
+
+/* --------------------------------------------------------------------------
+   16. COLLAPSIBLE (expand/collapse berbasis <details>)
+   -------------------------------------------------------------------------- */
+.m3-collapsible {
+  border: 1px solid var(--m3-outline-variant);
+  border-radius: var(--m3-shape-lg);
+  background: var(--m3-surface-container-lowest);
+  overflow: hidden;
+}
+.m3-collapsible__head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 14px 18px;
+  cursor: pointer;
+  list-style: none;
+  user-select: none;
+}
+.m3-collapsible__head::-webkit-details-marker { display: none; }
+.m3-collapsible__head::marker { content: none; }
+.m3-collapsible__head:hover { background: color-mix(in srgb, var(--m3-primary) 5%, transparent); }
+.m3-collapsible__chev {
+  transition: transform var(--m3-dur-short) var(--m3-ease-standard);
+  color: var(--m3-primary);
+}
+.m3-collapsible:not([open]) .m3-collapsible__chev { transform: rotate(-90deg); }
+.m3-collapsible__body { padding: 0 18px 18px; }
+@media (prefers-reduced-motion: reduce) {
+  .m3-collapsible__chev { transition: none; }
+}

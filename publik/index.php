@@ -68,12 +68,11 @@ $bulanan = $stmt->fetchAll();
 </header>
 
 <main class="m3-main" style="max-width:1100px;margin:0 auto">
-  <section class="m3-card m3-card--elevated m3-mb-3">
+  <!-- <section class="m3-card m3-card--elevated m3-mb-3">
     <div class="m3-card__body">
       <div class="m3-row--between" style="gap:16px;flex-wrap:wrap">
         <div class="m3-grow" style="min-width:240px">
-          <h1 class="m3-headline-small m3-mb-0">SIMAK Mahasiswa &amp; PKL</h1>
-          <p class="m3-body-medium m3-muted m3-mb-0">Rekapan absensi &amp; sertifikat terbuka untuk umum — tanpa perlu memasukkan NIM/NISN.</p>
+          <p class="m3-body-medium m3-muted m3-mb-0">Sistem Manajemen Absensi dan Kehadiran Mahasiswa &amp; Siswa</p>
         </div>
         <div class="m3-row m3-gap-sm" style="flex-wrap:wrap">
           <a href="<?= BASE_URL ?>/login.php" class="m3-btn m3-btn--filled m3-btn--sm"><span class="m3-icon m3-icon--sm">key</span>Masuk operator / dosen</a>
@@ -81,7 +80,7 @@ $bulanan = $stmt->fetchAll();
         </div>
       </div>
     </div>
-  </section>
+  </section> -->
 
   <h2 class="m3-title-medium">Rekapan absensi &amp; sertifikat</h2>
 

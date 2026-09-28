@@ -58,7 +58,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     <div class="m3-auth__head">
       <img src="<?= BASE_URL ?>/assets/images/logo-stikom.png" alt="" class="m3-auth__logo">
       <h1 class="m3-auth__title">Masuk</h1>
-      <p class="m3-auth__subtitle">Akun operator dan dosen pembimbing</p>
+      <!-- <p class="m3-auth__subtitle">Akun operator dan dosen pembimbing</p> -->
     </div>
 
     <?php if ($error): ?>

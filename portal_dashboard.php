@@ -101,6 +101,38 @@ if ($hasPwCol && $_SERVER['REQUEST_METHOD'] === 'POST' && ($_POST['aksi'] ?? '')
     }
 }
 
+// ==== Aksi: Unggah foto profil sendiri ====
+if ($_SERVER['REQUEST_METHOD'] === 'POST' && ($_POST['aksi'] ?? '') === 'foto') {
+    if (!csrfValid()) {
+        $flashLocal = 'Sesi form kadaluarsa, coba lagi.'; $flashType = 'danger';
+    } elseif (empty($_FILES['foto']) || $_FILES['foto']['error'] === UPLOAD_ERR_NO_FILE) {
+        $flashLocal = 'Pilih berkas foto terlebih dahulu.'; $flashType = 'danger';
+    } elseif ($_FILES['foto']['error'] !== UPLOAD_ERR_OK) {
+        $flashLocal = 'Terjadi kesalahan saat mengunggah foto.'; $flashType = 'danger';
+    } else {
+        $ext = strtolower(pathinfo($_FILES['foto']['name'], PATHINFO_EXTENSION));
+        if (!in_array($ext, ['jpg', 'jpeg', 'png'], true)) {
+            $flashLocal = 'Foto harus berformat JPG atau PNG.'; $flashType = 'danger';
+        } elseif ($_FILES['foto']['size'] > 2 * 1024 * 1024) {
+            $flashLocal = 'Ukuran foto maksimal 2 MB.'; $flashType = 'danger';
+        } else {
+            $namaBaru = 'foto_' . time() . '_' . bin2hex(random_bytes(4)) . '.' . $ext;
+            if (!is_dir(FOTO_DIR)) mkdir(FOTO_DIR, 0775, true);
+            if (!move_uploaded_file($_FILES['foto']['tmp_name'], FOTO_DIR . $namaBaru)) {
+                $flashLocal = 'Gagal menyimpan foto ke server.'; $flashType = 'danger';
+            } else {
+                if (!empty($peserta['foto']) && is_file(FOTO_DIR . $peserta['foto'])) @unlink(FOTO_DIR . $peserta['foto']);
+                $stmt = $pdo->prepare('UPDATE mahasiswa SET foto = ? WHERE id = ?');
+                $stmt->execute([$namaBaru, $pesertaId]);
+                $stmt = $pdo->prepare('SELECT m.*, d.nama AS nama_dosen FROM mahasiswa m LEFT JOIN dosen d ON d.id = m.dosen_id WHERE m.id = ?');
+                $stmt->execute([$pesertaId]);
+                $peserta = $stmt->fetch();
+                $flashLocal = 'Foto profil berhasil diperbarui.';
+            }
+        }
+    }
+}
+
 // Ambil ulang data absensi hari ini (setelah kemungkinan update)
 $stmt = $pdo->prepare('SELECT * FROM absensi WHERE mahasiswa_id = ? AND tanggal = ?');
 $stmt->execute([$pesertaId, $today]);
@@ -185,11 +217,28 @@ $sertifikatList = $stmt->fetchAll();
   <section class="m3-card m3-card--filled m3-mb-3">
     <div class="m3-card__body">
       <div class="m3-row m3-row--wrap" style="gap:20px">
-        <?php if ($peserta['foto']): ?>
-          <img src="<?= FOTO_URL . rawurlencode($peserta['foto']) ?>" alt="" class="m3-avatar m3-avatar--lg">
-        <?php else: ?>
-          <div class="m3-avatar m3-avatar--lg"><span class="m3-icon m3-icon--lg">person</span></div>
-        <?php endif; ?>
+        <div style="text-align:center">
+          <?php if ($peserta['foto']): ?>
+            <img id="fotoProfil" src="<?= FOTO_URL . rawurlencode($peserta['foto']) ?>" alt="Foto profil" class="m3-avatar m3-avatar--lg">
+          <?php else: ?>
+            <img id="fotoProfil" src="" alt="Foto profil" class="m3-avatar m3-avatar--lg" style="display:none">
+            <div id="fotoKosong" class="m3-avatar m3-avatar--lg"><span class="m3-icon m3-icon--lg">person</span></div>
+          <?php endif; ?>
+          <form method="post" enctype="multipart/form-data" class="m3-mt-2">
+            <?= csrfField() ?>
+            <input type="hidden" name="aksi" value="foto">
+            <label class="m3-btn m3-btn--outlined m3-btn--sm" for="fotoInput" style="cursor:pointer">
+              <span class="m3-icon m3-icon--sm">photo_camera</span><?= $peserta['foto'] ? 'Ganti foto' : 'Unggah foto' ?>
+            </label>
+            <input id="fotoInput" type="file" name="foto" accept=".jpg,.jpeg,.png" hidden onchange="pratinjauFotoProfil(this)">
+            <div class="m3-mt-2" id="wrapSimpanFoto" style="display:none">
+              <button type="submit" class="m3-btn m3-btn--filled m3-btn--sm">
+                <span class="m3-icon m3-icon--sm">upload</span>Simpan foto
+              </button>
+            </div>
+            <div class="m3-body-small m3-muted m3-mt-2">JPG/PNG, maks 2 MB.</div>
+          </form>
+        </div>
         <div class="m3-grow">
           <div class="m3-row m3-gap-sm m3-mb-1" style="flex-wrap:wrap">
             <h1 class="m3-headline-small m3-mb-0"><?= e($peserta['nama']) ?></h1>
@@ -277,7 +326,12 @@ $sertifikatList = $stmt->fetchAll();
         </div>
       </div>
 
-      <h2 class="m3-title-medium m3-mt-3 m3-mb-2">Riwayat absensi terakhir</h2>
+      <details class="m3-collapsible" open>
+        <summary class="m3-collapsible__head">
+          <span class="m3-title-medium">Riwayat absensi terakhir</span>
+          <span class="m3-icon m3-collapsible__chev">expand_more</span>
+        </summary>
+        <div class="m3-collapsible__body">
       <form method="get" class="m3-toolbar m3-mb-2">
         <input type="month" name="bulan" class="m3-input" style="width:auto" value="<?= e($bulanFilter) ?>">
         <button class="m3-btn m3-btn--tonal m3-btn--sm"><span class="m3-icon m3-icon--sm">filter_alt</span>Filter bulan</button>
@@ -319,6 +373,8 @@ $sertifikatList = $stmt->fetchAll();
           </tbody>
         </table>
       </div>
+        </div><!-- /.m3-collapsible__body -->
+      </details>
     </div>
   </section>
 
@@ -429,6 +485,18 @@ $sertifikatList = $stmt->fetchAll();
 </main>
 
 <footer class="m3-footer">&copy; <?= date('Y') ?> STIKOM 22 Januari</footer>
+<script>
+function pratinjauFotoProfil(input) {
+  if (input.files && input.files[0]) {
+    var img = document.getElementById('fotoProfil');
+    var kosong = document.getElementById('fotoKosong');
+    img.src = URL.createObjectURL(input.files[0]);
+    img.style.display = '';
+    if (kosong) kosong.style.display = 'none';
+    document.getElementById('wrapSimpanFoto').style.display = '';
+  }
+}
+</script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/ScrollTrigger.min.js"></script>
 <script src="<?= BASE_URL ?>/assets/js/material3.js"></script>
