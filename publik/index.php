@@ -60,7 +60,7 @@ $bulanan = $stmt->fetchAll();
 <header class="m3-appbar">
   <a class="m3-appbar__brand" href="<?= BASE_URL ?>/publik/">
     <img src="<?= BASE_URL ?>/assets/images/logo-stikom.png" alt="" class="m3-appbar__logo">
-    <span class="m3-appbar__title">Portal publik</span>
+    <!-- <span class="m3-appbar__title">Portal publik</span> -->
   </a>
   <span class="m3-appbar__spacer"></span>
   <a href="<?= BASE_URL ?>/login.php" class="m3-btn m3-btn--outlined m3-btn--sm"><span class="m3-icon m3-icon--sm">key</span>Masuk</a>
@@ -148,7 +148,7 @@ $bulanan = $stmt->fetchAll();
       </table>
     </div>
   </section>
-  <p class="m3-body-small m3-muted m3-mt-2">Menampilkan maks. 200 peserta. Data kontak detail (alamat/No. HP) disembunyikan di portal publik.</p>
+  <p class="m3-body-small m3-muted m3-mt-2">Menampilkan maks. 200 peserta.</p>
 </main>
 <footer class="m3-footer">&copy; <?= date('Y') ?> STIKOM 22 Januari &middot; Portal Publik</footer>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"></script>

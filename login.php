@@ -58,7 +58,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     <div class="m3-auth__head">
       <img src="<?= BASE_URL ?>/assets/images/logo-stikom.png" alt="" class="m3-auth__logo">
       <h1 class="m3-auth__title">Masuk</h1>
-      <!-- <p class="m3-auth__subtitle">Akun operator dan dosen pembimbing</p> -->
+      <p class="m3-auth__subtitle">Sebagai Dosen</p>
     </div>
 
     <?php if ($error): ?>
@@ -79,7 +79,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         <label class="m3-field__label" for="password">Password</label>
         <input id="password" type="password" name="password" class="m3-input" required autocomplete="current-password">
       </div>
-      <button type="submit" class="m3-btn m3-btn--filled m3-btn--block">Masuk</button>
+      <button type="submit" class="m3-btn m3-btn--filled m3-btn--block"><span class="m3-icon">login</span>Masuk</button>
     </form>
 
     <div class="m3-auth__divider">Mahasiswa atau siswa PKL?</div>

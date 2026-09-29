@@ -67,6 +67,7 @@ $totalSertifikat = $pdo->query("SELECT COUNT(*) FROM sertifikat")->fetchColumn()
     <div class="m3-auth__head">
       <img src="<?= BASE_URL ?>/assets/images/logo-stikom.png" alt="" class="m3-auth__logo">
       <h1 class="m3-auth__title">Masuk</h1>
+      <p class="m3-auth__subtitle">Sebagai Siswa/Mahasiswa</p>
     </div>
 
     <!-- <div class="m3-metrics">
@@ -96,7 +97,7 @@ $totalSertifikat = $pdo->query("SELECT COUNT(*) FROM sertifikat")->fetchColumn()
       <div class="m3-field m3-mb-2">
         <label class="m3-field__label" for="identitas">NIM atau NISN</label>
         <input id="identitas" type="text" name="identitas" class="m3-input" required autofocus
-               placeholder="Contoh: 2110511001">
+               placeholder="Contoh: 2110511012">
         <div class="m3-field__help">Mahasiswa memakai NIM, siswa PKL memakai NISN.</div>
       </div>
       <?php if ($hasPwCol): ?>
@@ -111,15 +112,16 @@ $totalSertifikat = $pdo->query("SELECT COUNT(*) FROM sertifikat")->fetchColumn()
       </button>
     </form>
 
-    <div class="m3-auth__divider">Lihat tanpa masuk?</div>
-    <a href="<?= BASE_URL ?>/publik/" class="m3-btn m3-btn--tonal m3-btn--block">
-      <span class="m3-icon">public</span>Beranda publik
+    <div class="m3-auth__divider"></div>
+
+        <a href="<?= BASE_URL ?>/login.php" class="m3-btn m3-btn--outlined m3-btn--block">
+  Masuk sebagai dosen
     </a>
 
-    <div class="m3-auth__divider">Operator atau dosen?</div>
+       <div class="m3-auth__divider">Lihat tanpa masuk?</div>
 
-    <a href="<?= BASE_URL ?>/login.php" class="m3-btn m3-btn--outlined m3-btn--block">
-      Masuk dengan akun
+    <a href="<?= BASE_URL ?>/publik/" class="m3-btn m3-btn--text m3-btn--block m3-mt-2">
+      <span class="m3-icon">public</span>Kembali ke beranda publik
     </a>
   </main>
 
